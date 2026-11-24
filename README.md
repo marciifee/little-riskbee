@@ -1,6 +1,8 @@
 # little-riskbee
 ![Little RiskBee – IT-Risikomanagement im Browser](./Little-RiskBee-GitHub-Banner.svg)
 
+**Little RiskBee** ist ein browserbasiertes Werkzeug zur Härtung von Servern und Clients. Du arbeitest Maßnahmen aus Katalogen wie BSI IT-Grundschutz oder dem SCAP Security Guide ab und ergänzt eigene Maßnahmen. Pro System bewertest du Risiken, dokumentierst die Umsetzung und prüfst, ob die Maßnahmen wirksam sind.
+
 ## Mit Docker Compose bereitstellen
 
 Voraussetzung sind Docker und das Compose-Plugin (`docker compose version`). Apache liefert die vorhandenen HTML-, CSS- und JavaScript-Dateien sowie die Beispieldateien aus. Die Anwendung benötigt weder einen Build-Schritt noch eine Datenbank.
