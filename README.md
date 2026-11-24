@@ -1,6 +1,10 @@
 # little-riskbee
 ![Little RiskBee – IT-Risikomanagement im Browser](./Little-RiskBee-GitHub-Banner.svg)
 
+## Mit Docker Compose bereitstellen
+
+Voraussetzung sind Docker und das Compose-Plugin (`docker compose version`). Apache liefert die vorhandenen HTML-, CSS- und JavaScript-Dateien sowie die Beispieldateien aus. Die Anwendung benötigt weder einen Build-Schritt noch eine Datenbank.
+
 ## Funktionen
 
 | Bereich | Was die Seite macht |
