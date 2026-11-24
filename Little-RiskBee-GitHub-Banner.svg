@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="400" viewBox="0 0 1280 400" role="img" aria-labelledby="banner-title banner-desc">
+  <title id="banner-title">Little RiskBee – IT-Risikomanagement im Browser</title>
+  <desc id="banner-desc">Assets erfassen, Risiken bewerten, Maßnahmen verfolgen und Ergebnisse berichten. Rechts steht die goldene Stinger-Biene vor einem türkisfarbenen Radar im Sechseck.</desc>
+  <defs>
+    <linearGradient id="banner-base" x2="1" y2=".45">
+      <stop stop-color="#080f20"/>
+      <stop offset=".6" stop-color="#101e33"/>
+      <stop offset="1" stop-color="#0e2937"/>
+    </linearGradient>
+    <radialGradient id="banner-glow">
+      <stop stop-color="#36d8cc" stop-opacity=".19"/>
+      <stop offset="1" stop-color="#36d8cc" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="banner-grid" width="36" height="36" patternUnits="userSpaceOnUse">
+      <path d="M0 36V0h36" fill="none" stroke="#70d9d5" stroke-opacity=".10"/>
+      <circle cx="0" cy="0" r="1.5" fill="#70d9d5" opacity=".23"/>
+    </pattern>
+    <clipPath id="banner-clip"><rect width="1280" height="400" rx="24"/></clipPath>
+  </defs>
+  <g clip-path="url(#banner-clip)">
+    <rect width="1280" height="400" fill="url(#banner-base)"/>
+    <ellipse cx="1024" cy="196" rx="357" ry="255" fill="url(#banner-glow)"/>
+    <path d="M882 0h398v400H644Z" fill="url(#banner-grid)"/>
+    <path d="M882 0 644 400m280-400L686 400" stroke="#52d8d0" stroke-opacity=".15"/>
+    <circle cx="1023" cy="200" r="174" fill="none" stroke="#69e9df" stroke-opacity=".23" stroke-dasharray="2 8"/>
+    <circle cx="1023" cy="200" r="193" fill="none" stroke="#69e9df" stroke-opacity=".13"/>
+    <path d="M826 200h394m-197-197v394" stroke="#69e9df" stroke-opacity=".16" stroke-dasharray="5 7"/>
+    <svg x="870" y="47" width="306" height="306" viewBox="0 0 256 256" aria-hidden="true"><defs>
+    <clipPath id="frame"><path d="M128 12 228 70v116l-100 58-100-58V70Z"/></clipPath>
+    <radialGradient id="base"><stop stop-color="#122c42"/><stop offset="1" stop-color="#080f20"/></radialGradient>
+    <linearGradient id="scan" x2=".25" y2="1"><stop stop-color="#66f4e4" stop-opacity=".55"/><stop offset="1" stop-color="#66f4e4" stop-opacity=".035"/></linearGradient>
+    <linearGradient id="honey" x2=".15" y2="1"><stop stop-color="#fff1bc"/><stop offset="1" stop-color="#e0a137"/></linearGradient>
+    <radialGradient id="glow"><stop stop-color="#66f4e4" stop-opacity=".65"/><stop offset="1" stop-color="#66f4e4" stop-opacity="0"/></radialGradient>
+    <pattern id="mesh" width="32" height="48.0" patternUnits="userSpaceOnUse" viewBox="0 0 32 48"><path d="m16 0 16 8v16l-16 8L0 24V8L16 0v-1m0 33v16M0 24v24m32-24v24" fill="none" stroke="#66f4e4" opacity=".29" stroke-width=".75"/></pattern>
+  </defs>
+  <path d="M128 12 228 70v116l-100 58-100-58V70Z" fill="url(#base)" stroke="#66f4e4" stroke-width="2"/>
+  <g clip-path="url(#frame)">
+    <path d="M128 12 228 70v116l-100 58-100-58V70Z" fill="url(#mesh)"/>
+    <g fill="none" stroke="#66f4e4" opacity=".48"><circle cx="128" cy="128" r="72"/><circle cx="128" cy="128" r="92" stroke-dasharray="3 5"/><path d="M128 36v15m0 154v15M36 128h15m154 0h15"/></g>
+    <path d="M31 164 206 64l20 35L31 211Z" fill="url(#scan)"/>
+    <path d="M31 164 206 64" fill="none" stroke="#66f4e4" stroke-width="1.5" opacity=".88"/>
+    <g transform="translate(179 79)"><circle r="11" fill="url(#glow)"/><circle r="6" fill="none" stroke="#66f4e4" opacity=".7"/><circle r="2.5" fill="#66f4e4"/></g><g transform="translate(71 141)"><circle r="11" fill="url(#glow)"/><circle r="6" fill="none" stroke="#66f4e4" opacity=".7"/><circle r="2.5" fill="#66f4e4"/></g><g transform="translate(183 166)"><circle r="11" fill="url(#glow)"/><circle r="6" fill="none" stroke="#66f4e4" opacity=".7"/><circle r="2.5" fill="#66f4e4"/></g>
+    <g stroke="#101425" stroke-width="3.5" stroke-linejoin="round">
+      <path fill="#e0f8f7" d="M117 127 78 121 58 92l36 6Zm22 0 39-6 20-29-36 6Z"/>
+      <path fill="url(#honey)" d="m128 121 30 17-11 27-19 29-19-29-11-27Z"/>
+      <path fill="#101425" stroke="none" d="m101 141 27 12 27-12-4 12-23 11-23-11Zm16 27 11 6 11-6-11 20Z"/>
+      <path d="m115 100-13-15m39 15 13-15" stroke="#ffe6a5" stroke-linecap="round"/>
+      <path fill="url(#honey)" d="m128 94 25 12-4 19-21 14-21-14-4-19Z"/>
+      <path fill="#101425" stroke="none" d="m110 111 15 6-2 6-11-5Zm36 0-15 6 2 6 11-5Z"/>
+    </g>
+  </g>
+</svg>
+    <rect x="69" y="89" width="42" height="3" rx="1.5" fill="#66f4e4"/>
+    <g font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+      <text x="67" y="176" font-weight="750" font-size="79" letter-spacing="-3" fill="#f4f8fc">Little <tspan fill="#ffd37a">RiskBee</tspan></text>
+      <text x="71" y="232" font-weight="550" font-size="31" fill="#b9d4df">IT-Risikomanagement im Browser</text>
+      <path d="M71 265h605" stroke="#61b7be" stroke-opacity=".36"/>
+      <text x="71" y="305" font-size="21" fill="#e2eff4">Assets erfassen <tspan fill="#66f4e4">·</tspan> Risiken bewerten</text>
+      <text x="71" y="337" font-size="21" fill="#e2eff4">Maßnahmen verfolgen <tspan fill="#66f4e4">·</tspan> Ergebnisse berichten</text>
+    </g>
+    <rect x="1" y="1" width="1278" height="398" rx="23" fill="none" stroke="#57bdbb" stroke-opacity=".32" stroke-width="2"/>
+  </g>
+</svg>
