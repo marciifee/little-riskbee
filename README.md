@@ -1,6 +1,26 @@
 # little-riskbee
 ![Little RiskBee – IT-Risikomanagement im Browser](./Little-RiskBee-GitHub-Banner.svg)
 
+## Funktionen
+
+| Bereich | Was die Seite macht |
+|---|---|
+| **Assets** | Systeme erfassen (Hostname, IP, OS, Rolle, Verantwortliche, Standort, Zweck), Bibliotheken je Asset zuordnen, Vorgehensweise (Basis / Standard / Kern) wählen. Import als CSV möglich. |
+| **Schutzbedarf** | Vertraulichkeit, Integrität, Verfügbarkeit je Asset: normal / hoch / sehr hoch mit Begründung (BSI-Standard 200-2, Maximumprinzip). Steuert, ob H-Anforderungen erscheinen. |
+| **Checkliste** | Maßnahmen interaktiv abarbeiten: Status (offen, umgesetzt, teilweise, nicht umgesetzt/Risiko, entbehrlich/gestrichen), Pflicht-Begründung beim Streichen, Notiz, Nachweis, Zuständigkeit, Termin, Prüfbefehle zum Kopieren, **Wirksamkeitskontrolle** (Ergebnis, Datum, Methode, Prüfer). Filter, Gruppierung, Massen-Streichung mit Begründung, eigene Maßnahmen. |
+| **Bibliotheken** | Vergleich: Anzahl Maßnahmen je Bibliothek und Betriebssystem, Aufteilung B/S/H, abgedeckte Themen, Abdeckungsmatrix (18 Themen), Referenzzahlen der Originalquellen, Einordnung. |
+| **Scans & Schwachstellen** | Je Asset alle importierten Scans mit Scan-Zeitpunkt aus dem Bericht, Importzeit, Dateiname und **SHA-256-Prüfsumme** als Nachweis. Je Befund: offen / teilweise behoben / behoben / Risiko akzeptiert / Fehlalarm + Begründung. Nicht mehr gefundene Befunde werden beim nächsten Scan automatisch als „behoben“ markiert; akzeptierte Risiken werden übernommen. |
+| **Risikobewertung** | Alle offenen, teilweise behobenen und akzeptierten Befunde der aktuellsten Scans mit Risiko-ID (R-001 …), Zielobjekt, Bedrohung (Vorschläge aus den elementaren Gefährdungen G 0.x), Eintrittshäufigkeit × Schadenshöhe (4 × 4, in Anlehnung an BSI-Standard 200-3), Heatmap grün → gelb → orange → rot, Behandlung (vermeiden / reduzieren / übertragen / akzeptieren), Maßnahme, Risikoeigner, Termin. Der Status ist derselbe wie unter „Scans“ (beidseitig synchron). Unbewertete Befunde erhalten einen Vorschlag aus Schwere und Schutzbedarf. |
+| **Projektrisiken, Chancen & SWOT** | Reiter „Chancen“ (Wahrscheinlichkeit × Nutzen, Strategien ausnutzen/verbessern/teilen/akzeptieren, eigene Matrix) und „SWOT-Analyse“ (Stärken, Schwächen, Chancen, Risiken + TOWS-Strategien; Übernahme aus Audit-Kennzahlen, Projektrisiken und Chancen). Reiter „Risiken“: Risikoanalyse des Härtungsprojekts: Risiko, Ursache, Kategorie, Eintrittswahrscheinlichkeit × Auswirkung (1–5) = Risikowert, Strategie, Gegenmaßnahmen, Frühwarnindikator, Zuständigkeit, Restrisiko nach Maßnahmen, Heatmaps vorher/nachher, Beispielrisiken als Startpunkt. |
+| **Roadmap** | Priorisierte Liste (P1 sofort … P4 nächstes Audit) aus offenen Befunden, offenen Checklisten-Maßnahmen und Projektrisiken, mit Zuständigkeit, Termin, Überfällig-Markierung und CSV-Export. |
+| **TOM-Übersicht** | Umsetzungsstand der technischen und organisatorischen Maßnahmen je Kategorie nach Art. 32 DSGVO (Übersicht und Bericht). |
+| **Import** | Nmap (XML, -oG, -oN; Netzscans werden je Host auf die Assets verteilt, offene Ports als Liste), Lynis (report.dat, lynis.log), OpenVAS/Greenbone (XML, CSV), OpenSCAP (Results/ARF – setzt Checklisten-Status automatisch), SSG-Datastream/XCCDF (Profil wählbar: CIS, STIG, ANSSI, BSI …), Grundschutz++ (OSCAL JSON/XML), BSI-Kompendium (XML/Text), CSV, DAT, XML, JSON. |
+| **Anleitungen** | Schritt-für-Schritt-Härtung: Vorgehen, Debian/Ubuntu, Fedora/RHEL, Windows Server/Windows 11, macOS, Scans & Nachweise – mit Befehlen und Verweisen in die Checkliste. |
+| **Bericht** | DIN-A4-Hochformat-Bericht als eigenständige HTML-Datei (Stammdaten, Schutzbedarf, Kennzahlen, Maßnahmen inkl. Wirksamkeit, Abweichungen mit Begründung, Scans mit Hash, TOM-Übersicht, Risikobewertung mit Heatmap, Projektrisiken, Roadmap, Unterschriftenfeld). Drucken bzw. „Als PDF speichern“. |
+| **Speichern** | Automatisch im Browser (IndexedDB, Fallback localStorage). Zusätzlich **💾 Speichern** bzw. `Strg+S` → JSON-Datei; **📂 Laden** stellt den Stand wieder her. |
+| **Branding** | In den Einstellungen: Logo hochladen (PNG/JPG/WebP/SVG, lokal verkleinert), Abteilung, Anschrift, Kontakt, Webseite, Berichtstitel, Fußzeile/Einstufung und Akzentfarbe. Erscheint auf dem Berichtsdeckblatt, in Kopf-/Fußzeilen und optional im Kopf der Oberfläche. |
+| **Darstellung** | Hell-/Dunkelmodus (automatisch oder manuell), responsiv für Desktop, Tablet und Smartphone, Deutsch/Englisch. |
+
 ## Bibliotheken
 
 | Bibliothek | In der Seite | Hinweis |
