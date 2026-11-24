@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Beispieldatei (fiktiv, gekürzt) – Ergebnisdatei von oscap xccdf eval (Option results) -->
+<Benchmark xmlns="http://checklists.nist.gov/xccdf/1.2" id="xccdf_org.ssgproject.content_benchmark_UBUNTU2404">
+ <title>Guide to the Secure Configuration of Ubuntu 24.04</title>
+ <Rule id="xccdf_org.ssgproject.content_rule_sshd_disable_root_login" severity="medium"><title>Disable SSH Root Login</title></Rule>
+ <Rule id="xccdf_org.ssgproject.content_rule_sshd_disable_empty_passwords" severity="high"><title>Disable SSH Access via Empty Passwords</title></Rule>
+ <Rule id="xccdf_org.ssgproject.content_rule_sysctl_kernel_randomize_va_space" severity="medium"><title>Enable Randomized Layout of Virtual Address Space</title></Rule>
+ <Rule id="xccdf_org.ssgproject.content_rule_sysctl_kernel_dmesg_restrict" severity="low"><title>Restrict Access to Kernel Message Buffer</title></Rule>
+ <Rule id="xccdf_org.ssgproject.content_rule_package_aide_installed" severity="medium"><title>Install AIDE</title></Rule>
+ <Rule id="xccdf_org.ssgproject.content_rule_service_auditd_enabled" severity="high"><title>Enable auditd Service</title></Rule>
+ <Rule id="xccdf_org.ssgproject.content_rule_file_permissions_etc_shadow" severity="medium"><title>Verify Permissions on shadow File</title></Rule>
+ <TestResult id="xccdf_org.open-scap_testresult_xccdf_org.ssgproject.content_profile_cis_level1_server" start-time="2025-11-19T09:40:00+01:00" end-time="2025-11-19T09:43:12+01:00">
+  <benchmark href="#scap_org.open-scap_comp_ssg-ubuntu2404-xccdf.xml" id="xccdf_org.ssgproject.content_benchmark_UBUNTU2404"/>
+  <title>OSCAP Scan Result</title>
+  <profile idref="xccdf_org.ssgproject.content_profile_cis_level1_server"/>
+  <target>web01</target>
+  <target-address>127.0.0.1</target-address>
+  <target-address>10.0.0.10</target-address>
+  <rule-result idref="xccdf_org.ssgproject.content_rule_sshd_disable_root_login" severity="medium"><result>fail</result></rule-result>
+  <rule-result idref="xccdf_org.ssgproject.content_rule_sshd_disable_empty_passwords" severity="high"><result>pass</result></rule-result>
+  <rule-result idref="xccdf_org.ssgproject.content_rule_sysctl_kernel_randomize_va_space" severity="medium"><result>pass</result></rule-result>
+  <rule-result idref="xccdf_org.ssgproject.content_rule_sysctl_kernel_dmesg_restrict" severity="low"><result>fail</result></rule-result>
+  <rule-result idref="xccdf_org.ssgproject.content_rule_package_aide_installed" severity="medium"><result>fail</result></rule-result>
+  <rule-result idref="xccdf_org.ssgproject.content_rule_service_auditd_enabled" severity="high"><result>fail</result></rule-result>
+  <rule-result idref="xccdf_org.ssgproject.content_rule_file_permissions_etc_shadow" severity="medium"><result>pass</result></rule-result>
+  <score system="urn:xccdf:scoring:default" maximum="100">42.85</score>
+ </TestResult>
+</Benchmark>

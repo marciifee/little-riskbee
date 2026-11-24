@@ -1,0 +1,21 @@
+{
+  "catalog": {
+    "uuid": "00000000-0000-4000-8000-000000000000",
+    "metadata": { "title": "OSCAL-Testkatalog (fiktive Inhalte)", "version": "0.0.1", "last-modified": "2025-11-19T00:00:00Z", "oscal-version": "1.1.2" },
+    "groups": [
+      { "id": "grp-a", "title": "Detektion",
+        "controls": [
+          { "id": "det-1", "title": "Protokollierung sicherheitsrelevanter Ereignisse",
+            "props": [ { "name": "sec_level", "value": "normal-SdT" }, { "name": "effort_level", "value": "2" } ],
+            "parts": [ { "id": "det-1_stm", "name": "statement", "prose": "Die Institution MUSS sicherheitsrelevante Ereignisse protokollieren (Testtext)." } ] },
+          { "id": "det-2", "title": "Zentrale Auswertung von Protokollen",
+            "props": [ { "name": "sec_level", "value": "erhöht" }, { "name": "effort_level", "value": "4" } ],
+            "parts": [ { "id": "det-2_stm", "name": "statement", "prose": "Protokolle SOLLTEN zentral ausgewertet werden (Testtext)." } ] } ] },
+      { "id": "grp-b", "title": "Konfigurationsmanagement",
+        "controls": [
+          { "id": "kon-1", "title": "Härtung von IT-Systemen",
+            "props": [ { "name": "sec_level", "value": "normal-SdT" } ],
+            "parts": [ { "id": "kon-1_stm", "name": "statement", "prose": "IT-Systeme MÜSSEN nach einer Härtungsvorgabe konfiguriert werden (Testtext)." } ] } ] }
+    ]
+  }
+}

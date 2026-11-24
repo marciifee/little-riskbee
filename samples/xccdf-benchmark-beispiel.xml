@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Beispieldatei (fiktiv, stark gekürzt) – Aufbau wie ein SSG-XCCDF-Benchmark mit zwei Profilen.
+     Für echte Vergleiche bitte ssg-<produkt>-ds.xml aus dem offiziellen SSG-Release importieren. -->
+<Benchmark xmlns="http://checklists.nist.gov/xccdf/1.2" id="xccdf_org.ssgproject.content_benchmark_DEMO">
+ <title>Guide to the Secure Configuration of Demo Linux</title>
+ <version>0.1.demo</version>
+ <Profile id="xccdf_org.ssgproject.content_profile_demo_level1"><title>Demo Level 1</title>
+  <select idref="xccdf_org.ssgproject.content_rule_sshd_disable_root_login" selected="true"/>
+  <select idref="xccdf_org.ssgproject.content_rule_service_auditd_enabled" selected="true"/>
+  <select idref="xccdf_org.ssgproject.content_rule_sysctl_kernel_randomize_va_space" selected="true"/>
+ </Profile>
+ <Profile id="xccdf_org.ssgproject.content_profile_demo_level2"><title>Demo Level 2</title>
+  <select idref="xccdf_org.ssgproject.content_rule_sshd_disable_root_login" selected="true"/>
+  <select idref="xccdf_org.ssgproject.content_rule_service_auditd_enabled" selected="true"/>
+  <select idref="xccdf_org.ssgproject.content_rule_sysctl_kernel_randomize_va_space" selected="true"/>
+  <select idref="xccdf_org.ssgproject.content_rule_audit_rules_immutable" selected="true"/>
+  <select idref="xccdf_org.ssgproject.content_rule_encrypt_partitions" selected="true"/>
+ </Profile>
+ <Group id="xccdf_org.ssgproject.content_group_system"><title>System Settings</title>
+  <Rule id="xccdf_org.ssgproject.content_rule_sshd_disable_root_login" severity="medium"><title>Disable SSH Root Login</title><description>Root login via SSH must be disabled.</description></Rule>
+  <Rule id="xccdf_org.ssgproject.content_rule_service_auditd_enabled" severity="high"><title>Enable auditd Service</title><description>auditd must run.</description></Rule>
+  <Rule id="xccdf_org.ssgproject.content_rule_sysctl_kernel_randomize_va_space" severity="medium"><title>Enable Randomized Layout of Virtual Address Space</title><description>ASLR.</description></Rule>
+  <Rule id="xccdf_org.ssgproject.content_rule_audit_rules_immutable" severity="medium"><title>Make the auditd Configuration Immutable</title><description>-e 2</description></Rule>
+  <Rule id="xccdf_org.ssgproject.content_rule_encrypt_partitions" severity="high"><title>Encrypt Partitions</title><description>LUKS.</description></Rule>
+ </Group>
+</Benchmark>

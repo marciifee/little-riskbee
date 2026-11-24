@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Beispieldatei (fiktiv) – Nmap -oX -->
+<nmaprun scanner="nmap" args="nmap -sS -sV -p- -oX nmap-web01.xml 10.0.0.10" start="1763546400" startstr="Wed Nov 19 10:00:00 2025" version="7.95" xmloutputversion="1.05">
+<host starttime="1763546400" endtime="1763546460"><status state="up" reason="echo-reply"/>
+<address addr="10.0.0.10" addrtype="ipv4"/>
+<hostnames><hostname name="web01.example.local" type="PTR"/></hostnames>
+<ports>
+<port protocol="tcp" portid="22"><state state="open" reason="syn-ack"/><service name="ssh" product="OpenSSH" version="9.6p1 Ubuntu 3ubuntu13"/></port>
+<port protocol="tcp" portid="80"><state state="open" reason="syn-ack"/><service name="http" product="nginx" version="1.24.0"/></port>
+<port protocol="tcp" portid="443"><state state="open" reason="syn-ack"/><service name="https" product="nginx" version="1.24.0"/></port>
+<port protocol="tcp" portid="631"><state state="open" reason="syn-ack"/><service name="ipp" product="CUPS" version="2.4"/></port>
+<port protocol="tcp" portid="3306"><state state="closed" reason="reset"/></port>
+</ports>
+<os><osmatch name="Linux 5.0 - 6.2" accuracy="95"/></os>
+</host>
+<runstats><finished time="1763546470" timestr="Wed Nov 19 10:01:10 2025" elapsed="70"/></runstats>
+</nmaprun>

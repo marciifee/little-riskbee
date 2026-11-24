@@ -1,0 +1,4 @@
+name;hostname;ip;os;owner;location;description
+web01;web01.example.local;10.0.0.10;Ubuntu 24.04 LTS;IT-Betrieb Linux;RZ Hamburg;Webserver Kundenportal (fiktiv)
+db01;db01.example.local;10.0.0.20;Windows Server 2022;IT-Betrieb Windows;RZ Hamburg;Datenbankserver (fiktiv)
+mac-01;mac-01.example.local;10.0.1.31;macOS 15;Service Desk;Düsseldorf;Arbeitsplatz Beratung (fiktiv)

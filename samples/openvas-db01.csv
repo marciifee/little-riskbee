@@ -1,0 +1,3 @@
+IP,Hostname,Port,Port Protocol,CVSS,Severity,QoD,Solution Type,NVT Name,Summary,Specific Result,NVT OID,CVEs,Task ID,Task Name,Timestamp,Result ID,Impact,Solution
+10.0.0.20,db01.example.local,5432,tcp,6.5,Medium,80,VendorFix,PostgreSQL Example Vulnerability,Beispielbefund (fiktiv),-,1.3.6.1.4.1.25623.1.0.990010,CVE-2025-0010,t2,Monatsscan Backend,2025-11-18T22:00:00Z,r10,-,PostgreSQL aktualisieren
+10.0.0.20,db01.example.local,3389,tcp,9.8,High,95,VendorFix,Remote Desktop Example Critical,Beispielbefund (fiktiv),-,1.3.6.1.4.1.25623.1.0.990011,CVE-2025-0011,t2,Monatsscan Backend,2025-11-18T22:00:00Z,r11,-,Patch einspielen und RDP beschränken

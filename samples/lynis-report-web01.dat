@@ -1,0 +1,23 @@
+# Lynis Report (Beispieldatei, fiktiv)
+report_version_major=1
+report_version_minor=0
+report_datetime_start=2025-11-19 09:30:01
+report_datetime_end=2025-11-19 09:31:12
+lynis_version=3.1.2
+os=Linux
+os_name=Ubuntu
+os_version=24.04
+hostname=web01
+network_ipv4_address[]=127.0.0.1
+network_ipv4_address[]=10.0.0.10
+hardening_index=63
+lynis_tests_done=262
+warning[]=PKGS-7392|Found one or more vulnerable packages.|-|-|
+warning[]=NETW-2705|Couldn't find 2 responsive nameservers|-|-|
+suggestion[]=SSH-7408|Consider hardening SSH configuration|AllowTcpForwarding (set YES to NO)|-|
+suggestion[]=SSH-7408|Consider hardening SSH configuration|MaxAuthTries (set 6 to 3)|-|
+suggestion[]=AUTH-9286|Configure maximum password age in /etc/login.defs|-|-|
+suggestion[]=KRNL-6000|One or more sysctl values differ from the scan profile and could be tweaked|kernel.dmesg_restrict (exp: 1)|Change sysctl value or disable test (skip-test=KRNL-6000:<sysctl-key>)|
+suggestion[]=FINT-4350|Install a file integrity tool to monitor changes to critical and sensitive files|-|-|
+suggestion[]=ACCT-9628|Enable auditd to collect audit information|-|-|
+suggestion[]=USB-1000|Disable drivers like USB storage when not used, to prevent unauthorized storage or data theft|-|-|
