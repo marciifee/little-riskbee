@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+  <title id="title">Little RiskBee – Hex Cyan Stinger</title>
+  <defs>
+    <clipPath id="frame"><path d="M128 12 228 70v116l-100 58-100-58V70Z"/></clipPath>
+    <radialGradient id="base"><stop stop-color="#122c42"/><stop offset="1" stop-color="#080f20"/></radialGradient>
+    <linearGradient id="scan" x2=".25" y2="1"><stop stop-color="#66f4e4" stop-opacity=".55"/><stop offset="1" stop-color="#66f4e4" stop-opacity=".035"/></linearGradient>
+    <linearGradient id="honey" x2=".15" y2="1"><stop stop-color="#fff1bc"/><stop offset="1" stop-color="#e0a137"/></linearGradient>
+    <radialGradient id="glow"><stop stop-color="#66f4e4" stop-opacity=".65"/><stop offset="1" stop-color="#66f4e4" stop-opacity="0"/></radialGradient>
+    <pattern id="mesh" width="32" height="48.0" patternUnits="userSpaceOnUse" viewBox="0 0 32 48"><path d="m16 0 16 8v16l-16 8L0 24V8L16 0v-1m0 33v16M0 24v24m32-24v24" fill="none" stroke="#66f4e4" opacity=".29" stroke-width=".75"/></pattern>
+  </defs>
+  <path d="M128 12 228 70v116l-100 58-100-58V70Z" fill="url(#base)" stroke="#66f4e4" stroke-width="2"/>
+  <g clip-path="url(#frame)">
+    <path d="M128 12 228 70v116l-100 58-100-58V70Z" fill="url(#mesh)"/>
+    <g fill="none" stroke="#66f4e4" opacity=".48"><circle cx="128" cy="128" r="72"/><circle cx="128" cy="128" r="92" stroke-dasharray="3 5"/><path d="M128 36v15m0 154v15M36 128h15m154 0h15"/></g>
+    <path d="M31 164 206 64l20 35L31 211Z" fill="url(#scan)"/>
+    <path d="M31 164 206 64" fill="none" stroke="#66f4e4" stroke-width="1.5" opacity=".88"/>
+    <g transform="translate(179 79)"><circle r="11" fill="url(#glow)"/><circle r="6" fill="none" stroke="#66f4e4" opacity=".7"/><circle r="2.5" fill="#66f4e4"/></g><g transform="translate(71 141)"><circle r="11" fill="url(#glow)"/><circle r="6" fill="none" stroke="#66f4e4" opacity=".7"/><circle r="2.5" fill="#66f4e4"/></g><g transform="translate(183 166)"><circle r="11" fill="url(#glow)"/><circle r="6" fill="none" stroke="#66f4e4" opacity=".7"/><circle r="2.5" fill="#66f4e4"/></g>
+    <g stroke="#101425" stroke-width="3.5" stroke-linejoin="round">
+      <path fill="#e0f8f7" d="M117 127 78 121 58 92l36 6Zm22 0 39-6 20-29-36 6Z"/>
+      <path fill="url(#honey)" d="m128 121 30 17-11 27-19 29-19-29-11-27Z"/>
+      <path fill="#101425" stroke="none" d="m101 141 27 12 27-12-4 12-23 11-23-11Zm16 27 11 6 11-6-11 20Z"/>
+      <path d="m115 100-13-15m39 15 13-15" stroke="#ffe6a5" stroke-linecap="round"/>
+      <path fill="url(#honey)" d="m128 94 25 12-4 19-21 14-21-14-4-19Z"/>
+      <path fill="#101425" stroke="none" d="m110 111 15 6-2 6-11-5Zm36 0-15 6 2 6 11-5Z"/>
+    </g>
+  </g>
+</svg>
