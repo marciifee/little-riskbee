@@ -5,6 +5,13 @@
 
 Voraussetzung sind Docker und das Compose-Plugin (`docker compose version`). Apache liefert die vorhandenen HTML-, CSS- und JavaScript-Dateien sowie die Beispieldateien aus. Die Anwendung benötigt weder einen Build-Schritt noch eine Datenbank.
 
+## Kontinuierliche Überprüfung nach PDCA
+
+- **Plan** – Assets und Befunde erfassen, Risiken bewerten und Maßnahmen planen.
+- **Do** – Maßnahmen umsetzen und die Bearbeitung dokumentieren.
+- **Check** – Die Wirksamkeit der Maßnahmen und das verbleibende Risiko überprüfen.
+- **Act** – Bewertungen aktualisieren und Maßnahmen bei Bedarf anpassen. Die jährliche Neubewertung liefert die Grundlage für den nächsten Durchlauf.
+
 ## Funktionen
 
 | Bereich | Was die Seite macht |
