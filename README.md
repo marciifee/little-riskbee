@@ -1,6 +1,18 @@
 # little-riskbee
 ![Little RiskBee – IT-Risikomanagement im Browser](./Little-RiskBee-GitHub-Banner.svg)
 
+## Bibliotheken
+
+| Bibliothek | In der Seite | Hinweis |
+|---|---|---|
+| **BSI IT-Grundschutz-Kompendium Edition 2023** | eingebaut: SYS.1.1, SYS.1.2.3, SYS.1.3, SYS.2.1, SYS.2.2.3, SYS.2.3, SYS.2.4 (ohne entfallene Anforderungen) | Titel wörtlich, Beschreibungen sinngemäß gekürzt – maßgeblich ist der BSI-Originaltext. Weitere Bausteine: Kompendium (XML/Text) importieren. |
+| **BSI Grundschutz++** | per Import (OSCAL) | Katalog aus dem BSI-GitHub-Repository „Stand-der-Technik-Bibliothek“ (CC BY-SA 4.0) importieren; Sicherheitsniveau (normal-SdT/erhöht), Aufwand und Modalverb werden ausgelesen. |
+| **OpenSCAP SCAP Security Guide** | eingebaut: kuratierter Auszug (87 Regeln, echte Regel-IDs, BSI-Zuordnungen laut ComplianceAsCode) | Vollständige Profile per Datastream-Import. OpenSCAP-Ergebnisse setzen den Status automatisch. |
+| **Microsoft Security Baseline** | eingebaut: kuratierte Auswahl | Volle Baseline: Security Compliance Toolkit. |
+| **mSCP (macOS, NIST)** | eingebaut: kuratierte Auswahl | Regel-IDs können je macOS-Version abweichen. |
+| **CIS, DISA STIG, ANSSI BP-028** | per Import (XCCDF bzw. SSG-Profile) | CIS ist für kommerzielle Nutzung lizenzpflichtig, daher nicht eingebaut. |
+| **Eigene Maßnahmen** | in der Checkliste anlegen, z. B. aus Lynis-Vorschlägen | – |
+
 ## Datenschutz (DSGVO)
 
 - Verarbeitung ausschließlich lokal im Browser. Im Docker-Betrieb liefert Apache die Anwendungsdateien aus. Importierte Befunde und Projektstände bleiben im Browser. Die Anwendung verwendet keine Cookies, Tracker, CDNs oder Webfonts.
