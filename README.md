@@ -3,9 +3,28 @@
 
 **Little RiskBee** ist ein browserbasiertes Werkzeug zur Härtung von Servern und Clients. Du arbeitest Maßnahmen aus Katalogen wie BSI IT-Grundschutz oder dem SCAP Security Guide ab und ergänzt eigene Maßnahmen. Pro System bewertest du Risiken, dokumentierst die Umsetzung und prüfst, ob die Maßnahmen wirksam sind.
 
-## Mit Docker Compose bereitstellen
+## Was Little RiskBee besonders macht
 
-Voraussetzung sind Docker und das Compose-Plugin (`docker compose version`). Apache liefert die vorhandenen HTML-, CSS- und JavaScript-Dateien sowie die Beispieldateien aus. Die Anwendung benötigt weder einen Build-Schritt noch eine Datenbank.
+**Little RiskBee verbindet die Härtung von Servern und Clients mit der Bewertung von IT-Risiken.** Du kombinierst Maßnahmen aus Katalogen wie dem BSI IT-Grundschutz oder dem SCAP Security Guide mit eigenen Vorgaben. Pro System dokumentierst du, welche Maßnahmen umgesetzt wurden, ob sie wirksam sind und welches Restrisiko verbleibt. Importierte Scanberichte liefern zusätzliche Befunde für die Bewertung und Nachverfolgung.
+
+## Für wen ist Little RiskBee gedacht?
+
+| Nutzerprofil | Typischer Einsatz |
+| --- | --- |
+| **IT-Admins mit Security-Schwerpunkt** | Server und Clients anhand von Härtungschecklisten prüfen und die Umsetzung dokumentieren. |
+| **Informationssicherheitsbeauftragte (ISB)** | Risiken priorisieren, Restrisiken nachvollziehen und die Wirksamkeit von Maßnahmen prüfen. |
+| **Compliance-Manager** | Kataloganforderungen und interne Vorgaben zusammenführen und Nachweise für Audits vorbereiten. |
+| **Interne Auditoren** | Umsetzungsstand, Abweichungen und Wirksamkeitsnachweise je System nachvollziehen. |
+| **Pentester** | Befunde aus abgeschlossenen Prüfungen übergeben und deren Behebung nachverfolgen. |
+| **IT Security Coordinators** | Maßnahmen koordinieren und Zuständigkeiten, Fristen und Fortschritt im Blick behalten. |
+
+## Was Little RiskBee nicht ist
+
+- **Kein Vulnerability Scanner.** Die Scans laufen in externen Werkzeugen. Berichte in unterstützten Formaten lassen sich importieren, um Befunde zu bewerten und ihre Behebung nachzuverfolgen.
+- **Kein SIEM.** Little RiskBee dient der Bearbeitung dokumentierter Befunde. Die zentrale Erfassung und Korrelation von Sicherheitsereignissen erfolgt in spezialisierten Systemen.
+- **Kein Echtzeitmonitoring.** Der Stand ergibt sich aus erfassten Befunden, importierten Berichten und dokumentierten Prüfungen.
+- **Kein Dokumentenmanagementsystem.** Berichte und Nachweise lassen sich exportieren. Die zentrale Ablage, Freigabe und Versionierung erfolgen außerhalb der Anwendung.
+- **Kein Fertigprodukt.** Little RiskBee ist ein erweiterbares Werkzeug, das du mit eigenen Maßnahmen und Katalogen an deine Umgebung anpasst.
 
 ## Kontinuierliche Überprüfung nach PDCA
 
@@ -52,6 +71,10 @@ Voraussetzung sind Docker und das Compose-Plugin (`docker compose version`). Apa
 - Eine Content-Security-Policy (`connect-src 'none'`) blockiert von der Anwendung initiierte Verbindungen über APIs wie Fetch, XMLHttpRequest oder WebSocket.
 - Speicherung in IndexedDB/localStorage des Browsers und in selbst exportierten JSON-Dateien; Löschen über *Einstellungen → Alle lokalen Daten löschen*.
 - Exporte und Berichte enthalten sicherheitskritische Informationen → vertraulich behandeln.
+
+## Mit Docker Compose bereitstellen
+
+Voraussetzung sind Docker und das Compose-Plugin (`docker compose version`). Apache liefert die vorhandenen HTML-, CSS- und JavaScript-Dateien sowie die Beispieldateien aus. Die Anwendung benötigt weder einen Build-Schritt noch eine Datenbank.
 
 ## Ordnerstruktur
 
