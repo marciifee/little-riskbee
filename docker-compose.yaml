@@ -1,0 +1,9 @@
+services:
+  little-riskbee:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: little-riskbee:local
+    ports:
+      - "127.0.0.1:8080:80"
+    restart: unless-stopped
