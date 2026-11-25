@@ -236,24 +236,23 @@ Lade danach die Seite im Browser neu. Da `nginx:stable-alpine` ein dynamischer T
 
 ### Geführter Probelauf
 
-Die Daten in [samples/](samples/) sind fiktiv:
+Im Ordner [samples/](samples/) liegen fiktive Beispieldateien bereit, mit denen du alle Funktionen unverbindlich testen kannst:
 
-1. [assets-beispiel.csv](samples/assets-beispiel.csv) importieren. Dadurch werden `web01`, `db01` und `mac-01` angelegt.
-2. [nmap-web01.xml](samples/nmap-web01.xml), [lynis-report-web01.dat](samples/lynis-report-web01.dat), [openvas-web01.xml](samples/openvas-web01.xml) und [openvas-db01.csv](samples/openvas-db01.csv) importieren und die Zuordnung über Hostname/IP prüfen.
-3. Mit [nmap-netz-beispiel.nmap](samples/nmap-netz-beispiel.nmap) die Verarbeitung mehrerer Hosts ausprobieren.
-4. [xccdf-benchmark-beispiel.xml](samples/xccdf-benchmark-beispiel.xml) für die Profilauswahl und [oscap-results-web01.xml](samples/oscap-results-web01.xml) für Scan-Ergebnisse verwenden. Regelzuordnungen hängen von den am Asset verwendeten Katalogen ab.
-5. [oscal-katalog-beispiel.json](samples/oscal-katalog-beispiel.json) zeigt einen OSCAL-Katalog mit fiktiven Inhalten, keinen offiziellen BSI-Text.
+1. [assets-beispiel.csv](samples/assets-beispiel.csv) importieren – dadurch werden die Beispielsysteme `web01`, `db01` und `mac-01` angelegt.
+2. [nmap-web01.xml](samples/nmap-web01.xml), [lynis-report-web01.dat](samples/lynis-report-web01.dat), [openvas-web01.xml](samples/openvas-web01.xml) und [openvas-db01.csv](samples/openvas-db01.csv) importieren und die automatische Zuordnung über Hostname und IP-Adresse prüfen.
+3. Mit [nmap-netz-beispiel.nmap](samples/nmap-netz-beispiel.nmap) die Verarbeitung eines Scans über mehrere Hosts hinweg ausprobieren.
+4. [xccdf-benchmark-beispiel.xml](samples/xccdf-benchmark-beispiel.xml) für die Profilauswahl und [oscap-results-web01.xml](samples/oscap-results-web01.xml) für automatisierte Scan-Ergebnisse nutzen (Hinweis: Regelzuordnungen greifen nur für Kataloge, die dem jeweiligen Asset zuvor zugewiesen wurden).
+5. [oscal-katalog-beispiel.json](samples/oscal-katalog-beispiel.json) testen – die Datei demonstriert den Aufbau eines OSCAL-Katalogs mit fiktiven Beispielinhalten.
 
 ## Speichern und Wiederherstellen
 
-- **Autosave:** IndexedDB, ersatzweise localStorage. Ist beides nicht verfügbar, bleibt nur flüchtiger Arbeitsspeicher; dann unbedingt per Datei sichern.
-- **Sicherung:** **Speichern** oder `Strg+S` / `Cmd+S` exportiert den gesamten Projektstand als `little-riskbee_<Datum>.json`.
-- **Wiederherstellung / Umzug:** **Laden** öffnen, JSON-Datei wählen und das Ersetzen des aktuellen Standes bestätigen. Zuvor den bisherigen Stand sichern; es erfolgt keine Zusammenführung von Projekten.
-- **Berichte:** HTML, PDF aus dem Druckdialog, CSV und andere fachliche Exporte dienen der Auswertung. Sie ersetzen keine vollständige JSON-Sicherung.
-- **Löschen:** **Einstellungen → Alle lokalen Daten löschen** entfernt den gespeicherten Anwendungsstand. Bereits heruntergeladene Dateien separat löschen.
-- **Kompatibilität:** Die interne Kennung `app: "hardening-audit"` und der Datenbankname bleiben bestehen, damit ältere Sicherungen und bestehende Browserdaten weiterverwendet werden können.
+- **Autosave:** Änderungen werden laufend in `IndexedDB` (oder ersatzweise `localStorage`) gesichert. Steht beides nicht zur Verfügung (z. B. bei restriktiven Browser-Einstellungen), verbleiben Daten nur im flüchtigen Arbeitsspeicher – sichere deinen Stand dann unbedingt regelmäßig als Datei.
+- **Sicherung:** Über **💾 Speichern** oder `Strg+S` / `Cmd+S` exportierst du den gesamten Projektstand als `little-riskbee_<Datum>.json`.
+- **Wiederherstellung / Umzug:** Über **📂 Laden** wählst du eine JSON-Sicherung aus und bestätigst das Überschreiben des aktuellen Standes. Sichere deinen bisherigen Stand zuvor, da Projekte nicht zusammengeführt werden.
+- **Berichte:** HTML-Berichte, PDF-Druckausgaben und CSV-Dateien dienen ausschließlich der Auswertung und Weitergabe – sie ersetzen keine vollständige JSON-Sicherung.
+- **Löschen:** Über **Einstellungen → Alle lokalen Daten löschen** entfernst du alle lokal im Browser gespeicherten Anwendungsdaten. Bereits heruntergeladene JSON-Sicherungen musst du bei Bedarf separat löschen.
 
-Browserprofil, privater Modus, gelöschte Website-Daten und Speicherquoten beeinflussen die Verfügbarkeit. Sicherungen an einem geschützten Ort außerhalb des Projektordners aufbewahren. Sie sind reguläre JSON-Dateien und werden von der Anwendung nicht verschlüsselt.
+> **Sicherheitshinweis:** Browserprofil, privater Modus, das Löschen von Website-Daten sowie Speicherquoten beeinflussen die lokale Verfügbarkeit. Bewahre JSON-Sicherungen an einem geschützten Ort außerhalb des Projektordners auf, da die Dateien unverschlüsselt gespeichert werden.
 
 ### Fachliche Einordnung
 
