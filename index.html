@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<!--
+  =====================================================================
+  Little-RiskBee  –  IT-Risikomanagement für das Hardening von Servern und Clients
+  ---------------------------------------------------------------------
+  Lokale Web-Anwendung zum Planen, Umsetzen, Prüfen und Verbessern (PDCA)
+  der Härtung von Windows-, Linux- und macOS-Systemen – mit Maßnahmen aus
+  Katalogen (BSI IT-Grundschutz Edition 2023 / Grundschutz++, OpenSCAP SSG,
+  Microsoft Baseline, mSCP …) oder eigenen Maßnahmen.
+
+  Start: Diese Datei per Doppelklick im Browser öffnen. Keine Installation,
+  kein Server, keine Internetverbindung, keine Cookies, keine Tracker.
+  Alle Daten bleiben im Browser dieses Rechners (IndexedDB) bzw. in den
+  JSON-Exportdateien, die Sie selbst speichern.
+
+  Aufbau:
+    css/style.css            – Layout, Hell-/Dunkelmodus, Responsive, Druck
+    js/i18n.js               – Texte Deutsch/Englisch
+    js/data/libraries.js     – Betriebssysteme, Themen, Bibliotheken
+    assets/                  – Logo und Favicons (Little RiskBee)
+    js/data/logo.js          – Standardlogo als Data-URI (für Kopf und Bericht)
+    js/data/catalog-*.js     – eingebaute Maßnahmenkataloge
+    js/data/checks.js        – erweiterte Prüfbefehle (je Plattform/Distribution)
+    js/data/guides.js        – Schritt-für-Schritt-Anleitungen
+    js/storage.js            – lokale Speicherung (IndexedDB/localStorage)
+    js/parsers.js            – Import (Nmap, Lynis, OpenVAS, OpenSCAP, OSCAL, CSV …)
+    js/report.js             – A4-Bericht (HTML, druckbar)
+    js/risk.js               – Risikobewertung, Projektrisiken, Roadmap, TOM
+    js/app.js                – Oberfläche und Logik
+  =====================================================================
+-->
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Content-Security-Policy: verbietet jede Netzwerkverbindung (connect-src 'none')
+       und externe Skripte. Damit ist technisch sichergestellt, dass keine Daten
+       den Rechner verlassen (DSGVO: Datenminimierung, keine Drittanbieter). -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <title>Little-RiskBee</title>
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Favicons (lokale Dateien, kein externer Abruf). SVG für moderne Browser,
+       ICO/PNG als Rückfall, Apple-Touch-Icon für iOS-Startbildschirm. -->
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/favicon.ico" sizes="16x16 32x32 48x48">
+  <link rel="icon" href="assets/favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <meta name="theme-color" content="#0b1727">
+  <meta name="description" content="Little-RiskBee – lokales IT-Risikomanagement-Tool für das Hardening von Servern und Clients nach dem PDCA-Zyklus">
+</head>
+<body>
+  <!-- Sprunglink für Tastatur- und Screenreader-Nutzung (Barrierefreiheit) -->
+  <a class="skip-link" href="#view" data-i18n="a11y.skip">Zum Inhalt springen</a>
+
+  <!-- ============ Kopfzeile ============ -->
+  <header class="topbar">
+    <button class="icon-btn menu-btn" id="menuBtn" aria-label="Menü" aria-expanded="false" aria-controls="sidebar">☰</button>
+    <div class="brand">
+      <img id="appLogo" class="app-logo" src="assets/little-riskbee.svg" alt="Little RiskBee">
+      <div>
+        <div class="brand-title" data-i18n="app.title">Little-RiskBee</div>
+        <div class="brand-sub" data-i18n="app.subtitle">IT-Risikomanagement · Hardening nach PDCA</div>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <span class="save-state" id="saveState" aria-live="polite"></span>
+      <button class="btn btn-sm" id="btnExport" data-i18n-title="btn.exportTitle"><span aria-hidden="true">💾</span> <span data-i18n="btn.save">Speichern</span></button>
+      <button class="btn btn-sm" id="btnLoad" data-i18n-title="btn.loadTitle"><span aria-hidden="true">📂</span> <span data-i18n="btn.load">Laden</span></button>
+      <button class="icon-btn" id="btnLang" aria-label="Sprache / Language">DE</button>
+      <button class="icon-btn" id="btnTheme" aria-label="Hell/Dunkel">🌓</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- ============ Navigation ============ -->
+    <nav class="sidebar" id="sidebar" aria-label="Hauptnavigation">
+      <ul>
+          <li><a href="#dashboard" data-view="dashboard"><span aria-hidden="true">📊</span> <span data-i18n="nav.dashboard">Übersicht</span></a></li>
+      </ul>
+      <div class="nav-group nav-plan"><span class="pdca-letter">P</span><span data-i18n="nav.g.plan">Plan – planen</span></div>
+      <ul>
+          <li><a href="#assets" data-view="assets"><span aria-hidden="true">🖥️</span> <span data-i18n="nav.assets">Assets</span></a></li>
+          <li><a href="#protection" data-view="protection"><span aria-hidden="true">🛡️</span> <span data-i18n="nav.protection">Schutzbedarf</span></a></li>
+          <li><a href="#libraries" data-view="libraries"><span aria-hidden="true">📚</span> <span data-i18n="nav.libraries">Bibliotheken</span></a></li>
+          <li><a href="#pm" data-view="pm"><span aria-hidden="true">📋</span> <span data-i18n="nav.pm">Projektrisiken &amp; SWOT</span></a></li>
+      </ul>
+      <div class="nav-group nav-do"><span class="pdca-letter">D</span><span data-i18n="nav.g.do">Do – umsetzen</span></div>
+      <ul>
+          <li><a href="#checklist" data-view="checklist"><span aria-hidden="true">✅</span> <span data-i18n="nav.checklist">Checkliste</span></a></li>
+          <li><a href="#guides" data-view="guides"><span aria-hidden="true">🧭</span> <span data-i18n="nav.guides">Anleitungen</span></a></li>
+      </ul>
+      <div class="nav-group nav-check"><span class="pdca-letter">C</span><span data-i18n="nav.g.check">Check – prüfen</span></div>
+      <ul>
+          <li><a href="#scans" data-view="scans"><span aria-hidden="true">🔎</span> <span data-i18n="nav.scans">Scans &amp; Schwachstellen</span></a></li>
+          <li><a href="#risk" data-view="risk"><span aria-hidden="true">🔥</span> <span data-i18n="nav.risk">Risikobewertung</span></a></li>
+      </ul>
+      <div class="nav-group nav-act"><span class="pdca-letter">A</span><span data-i18n="nav.g.act">Act – verbessern</span></div>
+      <ul>
+          <li><a href="#roadmap" data-view="roadmap"><span aria-hidden="true">🗺️</span> <span data-i18n="nav.roadmap">Roadmap</span></a></li>
+          <li><a href="#report" data-view="report"><span aria-hidden="true">🖨️</span> <span data-i18n="nav.report">Bericht</span></a></li>
+      </ul>
+      <div class="nav-group nav-data"><span data-i18n="nav.g.data">Daten</span></div>
+      <ul>
+          <li><a href="#import" data-view="import"><span aria-hidden="true">📥</span> <span data-i18n="nav.import">Import</span></a></li>
+          <li><a href="#settings" data-view="settings"><span aria-hidden="true">⚙️</span> <span data-i18n="nav.settings">Einstellungen</span></a></li>
+      </ul>
+      <p class="sidebar-note" data-i18n="app.privacyShort">Alle Daten bleiben lokal in diesem Browser. Keine Cookies, keine Tracker, keine Netzwerkzugriffe.</p>
+    </nav>
+
+    <!-- ============ Inhaltsbereich (wird von app.js befüllt) ============ -->
+    <main id="view" class="view" tabindex="-1"></main>
+  </div>
+
+  <!-- Dialog für Formulare (Asset bearbeiten, Bestätigungen …) -->
+  <dialog id="dlg" class="dlg"><form method="dialog" id="dlgForm"></form></dialog>
+
+  <!-- Meldungen (Toasts) -->
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+
+  <!-- Versteckte Datei-Eingaben -->
+  <input type="file" id="fileState" accept=".json,application/json" hidden>
+  <input type="file" id="fileImport" multiple hidden
+         accept=".xml,.csv,.dat,.log,.txt,.json,.nmap,.gnmap,.arf">
+
+  <noscript><p style="padding:2rem">Bitte JavaScript aktivieren – die Anwendung läuft vollständig lokal.</p></noscript>
+
+  <!-- Skripte in Abhängigkeitsreihenfolge (klassische Skripte, damit file:// funktioniert) -->
+  <script src="js/i18n.js"></script>
+  <script src="js/data/logo.js"></script>
+  <script src="js/data/libraries.js"></script>
+  <script src="js/data/catalog-bsi.js"></script>
+  <script src="js/data/catalog-ssg.js"></script>
+  <script src="js/data/catalog-extra.js"></script>
+  <script src="js/data/checks.js"></script>
+  <script src="js/data/guides.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/parsers.js"></script>
+  <script src="js/report.js"></script>
+  <script src="js/risk.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
