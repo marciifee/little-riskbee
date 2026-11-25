@@ -42,6 +42,15 @@ HA.App = (function () {
   };
   var saveTimer = null;
 
+  /* -----------------------------------------------------------------
+   * Erweiterungs-Schnittstelle (für js/modules/*.js)
+   * Module registrieren Ansichten, Ereignis-Handler, Einstellungs- und
+   * Übersichtskarten sowie Normalisierung. Handler geben true zurück,
+   * wenn sie ein Ereignis vollständig behandelt haben.
+   * --------------------------------------------------------------- */
+  var EXT = { click: [], change: [], input: [], afterRender: [], normalize: [], settingsCards: [], dashCards: [], reportOpts: [], beforeSave: [] };
+  function runExt(list, a, b, c) { for (var i = 0; i < list.length; i++) { if (list[i](a, b, c) === true) return true; } return false; }
+
   function defaultState() {
     var now = new Date().toISOString();
     return { app: 'hardening-audit', version: 1,
@@ -57,6 +66,8 @@ HA.App = (function () {
     s.assets.forEach(function (a) {
       a.checks = a.checks || {}; a.scans = a.scans || []; a.libs = a.libs || []; a.sb = a.sb || { c: 'normal', i: 'normal', a: 'normal' };
       a.approach = a.approach || 'standard';
+      a.kind = a.kind || 'system';                       // Zielobjekt-Typ (Geltungsbereich), ältere Stände = IT-System
+      if (!Array.isArray(a.modules)) a.modules = [];     // modellierte IT-Grundschutz-Bausteine
     });
     s.app = 'hardening-audit'; s.seq = s.seq || 1;
     if (!Array.isArray(s.projectRisks)) s.projectRisks = [];
@@ -66,6 +77,7 @@ HA.App = (function () {
     s.meta.brand = Object.assign({ logo: '', subtitle: '', address: '', contact: '', web: '', color: '#1f6feb', useInApp: false, logoInApp: true, footer: '', reportTitle: '' }, s.meta.brand || {});
     s.pmSeq = s.pmSeq || (s.projectRisks.length + 1); s.riskSeq = s.riskSeq || 1;
     HA.Risk.ensureIds(s);   // Risiko-IDs für alle aktuellen Befunde
+    EXT.normalize.forEach(function (fn) { fn(s); });   // Module ergänzen ihre Datenbereiche
     return s;
   }
   function uid(p) { return (p || 'id') + '-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
@@ -76,6 +88,7 @@ HA.App = (function () {
     setSaveState(t('save.saving'));
     clearTimeout(saveTimer);
     saveTimer = setTimeout(function () {
+      EXT.beforeSave.forEach(function (fn) { fn(state); });
       HA.Storage.save(state).then(function () {
         setSaveState(t('save.saved', { time: new Date().toLocaleTimeString(HA.lang === 'de' ? 'de-DE' : 'en-GB', { hour: '2-digit', minute: '2-digit' }) }));
       }).catch(function () { setSaveState(t('save.error')); toast(t('save.error'), true); });
@@ -85,7 +98,8 @@ HA.App = (function () {
 
   function exportState() {
     var d = new Date(), pad = function (n) { return ('0' + n).slice(-2); };
-    var name = 'haertungs-audit_' + d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + '_' + pad(d.getHours()) + pad(d.getMinutes()) + '.json';
+    EXT.beforeSave.forEach(function (fn) { fn(state); });
+    var name = 'little-riskbee_' + d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + '_' + pad(d.getHours()) + pad(d.getMinutes()) + '.json';
     HA.Storage.exportFile(state, name);
     toast(t('msg.exported'));
   }
@@ -102,10 +116,34 @@ HA.App = (function () {
     var list = HA.builtinItems().slice();
     state.catalogs.forEach(function (c) { c.items.forEach(function (it) { it.lib = c.lib; list.push(it); }); });
     state.customItems.forEach(function (it) { list.push(it); });
+    // Baustein-Gesamtbewertung je Baustein (wird nur angezeigt, wenn keine Einzelanforderungen vorliegen)
+    VIRT = {};
+    HA.GS.BAUSTEINE.forEach(function (b) {
+      var v = { lib: 'gsmod', ref: b.id, group: b.id, level: 'B', topic: LAYER_TOPIC[b.layer] || 'planning', os: null, role: 'any', virtual: true,
+        title: { de: 'Baustein ' + b.id + ' ' + b.de + ' – Gesamtbewertung', en: 'Module ' + b.id + ' ' + b.en + ' – overall assessment' },
+        desc: { de: b.d.de + ' Bewerten Sie, ob die Anforderungen des Bausteins insgesamt erfüllt sind. Einzelanforderungen: Kompendium (XML) unter „Import“ laden oder eigene Anforderungen zum Baustein ergänzen.',
+          en: b.d.en + ' Assess whether the module requirements are met overall. Individual requirements: import the compendium (XML) or add custom requirements for the module.' } };
+      VIRT[b.id] = v; list.push(v);
+    });
     list.forEach(function (it, i) { it._i = i; it._key = it.lib + '|' + it.ref; });
     itemCache = list;
     return list;
   }
+  var VIRT = {};
+  var LAYER_TOPIC = { ISMS: 'planning', ORP: 'planning', CON: 'planning', OPS: 'availability', DER: 'integrity', APP: 'install', SYS: 'install', IND: 'availability', NET: 'network', INF: 'availability' };
+  var GS_BS = /^(?:ISMS|ORP|CON|OPS|DER|APP|SYS|IND|NET|INF)(?:\.\d+)+$/, GS_REQ = /^((?:ISMS|ORP|CON|OPS|DER|APP|SYS|IND|NET|INF)(?:\.\d+)+)\.A\d+/;
+  /** IT-Grundschutz-Baustein einer Maßnahme (z. B. "SYS.1.3") oder '' (SSG, Baselines …). */
+  function bausteinOf(it) {
+    if (GS_BS.test(it.group || '')) return it.group;
+    var m = GS_REQ.exec(it.ref || ''); return m ? m[1] : '';
+  }
+  function assetKind(a) { return (a && a.kind) || 'system'; }
+  /** Assets nach Zielobjekt-Typ gruppiert (Reihenfolge des Schichtenmodells). */
+  function kindGroups(list) {
+    list = list || state.assets;
+    return HA.GS.KINDS.map(function (k) { return { kind: k, assets: list.filter(function (a) { return assetKind(a) === k.id; }) }; }).filter(function (g) { return g.assets.length; });
+  }
+  function kindLabel(a) { var k = HA.GS.kind(assetKind(a)); return k.icon + ' ' + tx(k); }
   function itemKey(it) { return it._key || (it.lib + '|' + it.ref); }
 
   /** Bibliotheks-Metadaten (eingebaut oder importiert). */
@@ -151,15 +189,32 @@ HA.App = (function () {
     return true;
   }
   /** Für das Asset anwendbare Maßnahmen (Bibliothek + Plattform + Niveau). */
+  /* Regeln:
+   *  – IT-Systeme: wie bisher Bibliothek + Plattform (OS/Rolle). Sind Bausteine modelliert,
+   *    gelten Grundschutz-Anforderungen nur für diese Bausteine.
+   *  – Andere Zielobjekt-Typen (Prozesse, Anwendungen, Netze, Räume, ICS): alle Grundschutz-
+   *    Anforderungen (eingebaut, importiert, eigene) der modellierten Bausteine.
+   *  – Modellierte Bausteine ohne Einzelanforderungen erscheinen als Baustein-Gesamtbewertung. */
   function applicableItems(asset, ignoreLevel) {
-    var lv = allowedLevels(asset);
-    return allItems().filter(function (it) {
-      if (it.lib === 'custom') { if (it.assetId && it.assetId !== asset.id) return false; if (!it.assetId && asset.libs.indexOf('custom') < 0) return false; }
-      else if (asset.libs.indexOf(it.lib) < 0) return false;
-      if (!matchesPlatform(it, asset)) return false;
+    var lv = allowedLevels(asset), sys = assetKind(asset) === 'system', mods = asset.modules || [], useMods = mods.length > 0, covered = {};
+    var list = allItems().filter(function (it) {
+      if (it.lib === 'gsmod') return false;
+      var bs = bausteinOf(it);
+      if (it.lib === 'custom') {
+        if (it.assetId && it.assetId !== asset.id) return false;
+        if (!it.assetId && asset.libs.indexOf('custom') < 0) return false;
+        if (!it.assetId && bs && useMods && mods.indexOf(bs) < 0) return false;
+      } else if (bs) {
+        if (useMods) { if (mods.indexOf(bs) < 0) return false; if (sys && asset.libs.indexOf(it.lib) < 0) return false; }
+        else if (!sys || asset.libs.indexOf(it.lib) < 0) return false;
+      } else if (!sys || asset.libs.indexOf(it.lib) < 0) return false;
+      if (sys && !matchesPlatform(it, asset)) return false;
+      if (bs && it.lib !== 'custom') covered[bs] = true;
       if (!ignoreLevel && lv.indexOf(it.level || 'S') < 0) return false;
       return true;
     });
+    if (useMods) mods.forEach(function (bs) { if (!covered[bs] && VIRT[bs]) list.push(VIRT[bs]); });
+    return list;
   }
   /** Prüfbefehl passend zum Asset: erst distributionsspezifisch (z. B. "fedora"), dann Plattform-Familie. */
   function checkCmd(it, asset) {
@@ -239,29 +294,38 @@ HA.App = (function () {
   function codeBlock(code) {
     return '<div class="code"><button type="button" class="btn btn-sm copy" data-act="copy">' + esc(t('btn.copy')) + '</button><pre>' + esc(code) + '</pre></div>';
   }
+  /* Personenfelder: Auswahlliste der Ansprechpersonen (Einstellungen) anbieten.
+     Ein <datalist> erlaubt Drop-Down-Auswahl UND freie Eingabe. */
+  var PERSON_SEL = 'input[name=owner],input[name=person],input[name=deputy],input[name=lead],input[name=evaluatedBy],input[name=approvedBy],input[name=by],' +
+    'input[data-field=responsible],input[data-field=verBy],input[data-k=owner],input[data-person]';
+  function decoratePersons(root) {
+    if (!root || !document.getElementById('dl-contacts')) return;
+    root.querySelectorAll(PERSON_SEL).forEach(function (inp) { if (inp.type === 'text' || !inp.getAttribute('type')) { inp.setAttribute('list', 'dl-contacts'); inp.setAttribute('autocomplete', 'off'); } });
+  }
   function opt(value, label, sel) { return '<option value="' + esc(value) + '"' + (String(sel) === String(value) ? ' selected' : '') + '>' + esc(label) + '</option>'; }
   function assetSelect(id, current, withEmpty, emptyLabel) {
+    var groups = kindGroups();
     return '<select id="' + id + '" data-act="' + id + '">' + (withEmpty ? opt('', emptyLabel || '–', current) : '') +
-      state.assets.map(function (a) { return opt(a.id, a.name, current); }).join('') + '</select>';
+      (groups.length > 1 ? groups.map(function (g) { return '<optgroup label="' + esc(g.kind.icon + ' ' + tx(g.kind)) + '">' + g.assets.map(function (a) { return opt(a.id, a.name, current); }).join('') + '</optgroup>'; }).join('')
+        : state.assets.map(function (a) { return opt(a.id, a.name, current); }).join('')) + '</select>';
   }
   function currentAsset() {
     var a = state.assets.find(function (x) { return x.id === ui.assetId; });
     if (!a && state.assets.length) { a = state.assets[0]; ui.assetId = a.id; }
     return a || null;
   }
-  var BAUSTEINE = {
-    'SYS.1.1': 'Allgemeiner Server', 'SYS.1.2.3': 'Windows Server', 'SYS.1.3': 'Server unter Linux und Unix', 'SYS.2.1': 'Allgemeiner Client',
-    'SYS.2.2.3': 'Clients unter Windows', 'SYS.2.3': 'Clients unter Linux und Unix', 'SYS.2.4': 'Clients unter macOS'
-  };
   function groupLabel(it) {
-    if (it.lib === 'bsi2023' || /^bsi/.test(it.lib)) return it.group + (BAUSTEINE[it.group] ? ' ' + BAUSTEINE[it.group] : '');
+    var bs = bausteinOf(it);
+    if (bs) return bs + ' ' + (HA.GS.title(bs) || '');
     if (it.lib === 'gspp' && it.group) return 'Grundschutz++ › ' + it.group;
     return getLib(it.lib).short + ' – ' + tx(HA.topicById(it.topic));
   }
 
   /** Einfacher modaler Dialog. fields: HTML; onOk(form) → true = schließen */
   function dialog(title, bodyHtml, onOk, okLabel) {
-    var dlg = document.getElementById('dlg'), form = document.getElementById('dlgForm');
+    var dlg = document.getElementById('dlg'), old = document.getElementById('dlgForm');
+    // Formular jedes Mal frisch anlegen: entfernt Ereignis-Listener und Breiten-Klassen des vorherigen Dialogs
+    var form = old.cloneNode(false); form.className = ''; old.parentNode.replaceChild(form, old);
     form.innerHTML = '<h2>' + esc(title) + '</h2>' + bodyHtml +
       '<div class="dlg-actions"><button type="button" class="btn" value="cancel" data-dlg="cancel">' + esc(t('btn.cancel')) + '</button>' +
       '<button type="submit" class="btn btn-primary" value="ok">' + esc(okLabel || t('btn.ok')) + '</button></div>';
@@ -271,6 +335,7 @@ HA.App = (function () {
     };
     form.querySelector('[data-dlg=cancel]').onclick = function () { dlg.close(); };
     dlg.showModal();
+    decoratePersons(form);
     var first = form.querySelector('input,select,textarea'); if (first) first.focus();
     return form;
   }
@@ -292,7 +357,7 @@ HA.App = (function () {
       var ls = latestScan(a, 'openvas');
       var stale = ls && daysSince(ls.scanDate || ls.importedAt) > (state.meta.staleDays || 90);
       return '<tr><td><a href="#checklist" data-act="openAsset" data-id="' + a.id + '"><b>' + esc(a.name) + '</b></a><div class="small muted">' + esc(a.hostname || a.ip || '') + '</div></td>' +
-        '<td>' + esc(tx(HA.osById(a.os))) + '</td><td>' + esc(t('prot.' + overallProtection(a))) + '</td><td>' + a.libs.map(libBadge).join(' ') + '</td>' +
+        '<td>' + typeCell(a) + '</td><td>' + esc(t('prot.' + overallProtection(a))) + '</td><td>' + modelCell(a) + '</td>' +
         '<td style="min-width:160px">' + progressBar(s) + '<div class="small muted">' + s.pct + ' % · ' + s.done + '/' + s.applicable + (s.missingJust ? ' · <span style="color:var(--danger)">⚠ ' + s.missingJust + ' ' + esc(t('cl.missingJust')) + '</span>' : '') + '</div></td>' +
         '<td>' + (ls ? fmtDate(ls.scanDate || ls.importedAt) + (stale ? '<div class="small" style="color:var(--warn)">⚠ ' + esc(t('dash.staleScan', { days: state.meta.staleDays })) + '</div>' : '') : '<span class="muted">' + esc(t('dash.noScan')) + '</span>') + '</td>' +
         '<td class="num">' + of + '</td></tr>';
@@ -303,12 +368,15 @@ HA.App = (function () {
       '<div class="card stat"><div class="value">' + tot.applicable + '</div><div class="label">' + esc(t('dash.measures')) + '</div></div>' +
       '<div class="card stat"><div class="value">' + tot.pct + ' %</div><div class="label">' + esc(t('dash.progress')) + '</div></div>' +
       '<div class="card stat"><div class="value">' + findings + '</div><div class="label">' + esc(t('dash.findings')) + '</div></div></div>');
+    h.push(pdcaCard());
+    var extCards = EXT.dashCards.map(function (fn) { return fn(); }).filter(Boolean);   // z. B. Fällige Pflichten, KPI
+    if (extCards.length) h.push('<div class="grid grid-2 dash-ext">' + extCards.join('') + '</div>');
     if (!state.assets.length) {
       h.push('<div class="card"><h2>' + esc(t('dash.start')) + '</h2><ol><li>' + esc(t('dash.step1')) + '</li><li>' + esc(t('dash.step2')) + '</li><li>' + esc(t('dash.step3')) + '</li><li>' + esc(t('dash.step4')) +
         '</li></ol><div class="row"><button class="btn btn-primary" data-act="newAsset">' + esc(t('btn.newAsset')) + '</button><a class="btn" href="#guides">' + esc(t('nav.guides')) + '</a><a class="btn" href="#libraries">' + esc(t('nav.libraries')) + '</a></div></div>');
     } else {
-      h.push('<div class="card"><h2>' + esc(t('dash.perAsset')) + '</h2><div class="table-wrap"><table><thead><tr><th>' + esc(t('c.asset')) + '</th><th>' + esc(t('c.os')) + '</th><th>' + esc(t('nav.protection')) + '</th><th>' + esc(t('c.libraries')) +
-        '</th><th>' + esc(t('c.progress')) + '</th><th>' + esc(t('dash.lastScan')) + '</th><th class="num">' + esc(t('dash.findings')) + '</th></tr></thead><tbody>' + rows.join('') + '</tbody></table></div>' + legend() + '</div>');
+      h.push('<div class="card"><h2>' + esc(t('dash.perAsset')) + '</h2><div class="table-wrap"><table><thead><tr><th>' + esc(t('c.asset')) + '</th><th>' + esc(L2('Typ / Betriebssystem', 'Type / OS')) + '</th><th>' + esc(t('nav.protection')) + '</th><th>' + esc(t('c.libraries')) +
+        '</th><th>' + esc(t('c.progress')) + '</th><th>' + esc(t('dash.lastScan')) + '</th><th class="num">' + esc(t('dash.findings')) + '</th></tr></thead><tbody>' + groupedRows(rows, 7) + '</tbody></table></div>' + legend() + '</div>');
     }
     if (state.assets.length) {
       var rr = HA.Risk.findingRows(state, {});
@@ -320,29 +388,119 @@ HA.App = (function () {
     h.push('<div class="note' + (mode === 'mem' ? ' warn' : '') + '">' + esc(t('dash.storage', { mode: t('store.' + mode) })) + ' · ' + esc(t('dash.notSavedFile')) + '</div>');
     return h.join('');
   };
+  function L2(de, en) { return HA.lang === 'en' ? en : de; }
+  /** Zeilen (gleiche Reihenfolge wie state.assets) mit Gruppenköpfen je Zielobjekt-Typ. */
+  function groupedRows(rows, cols) {
+    var groups = kindGroups();
+    if (groups.length < 2) return rows.join('');
+    return groups.map(function (g) {
+      return '<tr class="grp-row"><th colspan="' + cols + '">' + esc(g.kind.icon + ' ' + tx(g.kind)) + ' <span class="muted small">(' + g.assets.length + ')</span></th></tr>' +
+        g.assets.map(function (a) { return rows[state.assets.indexOf(a)]; }).join('');
+    }).join('');
+  }
+  /** Spalte „Typ“: Betriebssystem bei IT-Systemen, sonst Zielobjekt-Typ. */
+  function typeCell(a) {
+    if (assetKind(a) === 'system') return esc(tx(HA.osById(a.os)));
+    return esc(kindLabel(a)) + (a.osVersion ? '<div class="small muted">' + esc(a.osVersion) + '</div>' : '');
+  }
+  /** Spalte „Modellierung“: Bibliotheken + modellierte Bausteine. */
+  function modelCell(a) {
+    var mods = a.modules || [];
+    return (assetKind(a) === 'system' ? a.libs.map(libBadge).join(' ') : a.libs.filter(function (l) { return l === 'custom'; }).map(libBadge).join(' ')) +
+      (mods.length ? '<div class="mod-chips">' + mods.slice(0, 6).map(function (m) { return '<span class="chip chip-gs" title="' + esc(HA.GS.title(m)) + '">' + esc(m) + '</span>'; }).join('') +
+        (mods.length > 6 ? '<span class="chip chip-gs" title="' + esc(mods.slice(6).join(', ')) + '">+' + (mods.length - 6) + '</span>' : '') + '</div>' : '');
+  }
+
+  /* ---------- PDCA-Zyklus (Übersicht) ---------- */
+  /** Kennzahlen je PDCA-Phase aus dem aktuellen Stand ableiten. */
+  function pdcaCard() {
+    var n = state.assets.length;
+    var sbOk = state.assets.filter(function (a) { return a.sb && a.sb.cNote && a.sb.iNote && a.sb.aNote; }).length;
+    var withLib = state.assets.filter(function (a) { return (a.libs || []).length || (a.modules || []).length; }).length;
+    var pmRated = state.projectRisks.length;
+    var tot = { done: 0, partial: 0, applicable: 0, verified: 0, missingJust: 0 };
+    state.assets.forEach(function (a) { var s = assetStats(a); Object.keys(tot).forEach(function (k) { tot[k] += s[k]; }); });
+    var pct = tot.applicable ? Math.round((tot.done + tot.partial * 0.5) / tot.applicable * 100) : 0;
+    var withScan = state.assets.filter(function (a) { return (a.scans || []).some(function (s) { return s.tool === 'openvas'; }); }).length;
+    var rows = HA.Risk.findingRows(state, {}), rated = rows.filter(function (r) { return !r.suggested; }).length;
+    var rm = HA.Risk.roadmap(state, { includeProject: true });
+    var p1 = rm.filter(function (x) { return x.prio === 'p1'; }).length, overdue = rm.filter(function (x) { return x.overdue; }).length;
+    function m(label, val, warn) { return '<li><span>' + esc(label) + '</span><b' + (warn ? ' style="color:var(--danger)"' : '') + '>' + val + '</b></li>'; }
+    var phases = [
+      { k: 'plan', go: 'assets', items: [m(t('pdca.m.sb'), sbOk + '/' + n, sbOk < n), m(t('pdca.m.libs'), withLib + '/' + n, withLib < n), m(t('pdca.m.pm'), pmRated)] },
+      { k: 'do', go: 'checklist', items: [m(t('pdca.m.impl'), pct + ' %'), m(t('pdca.m.just'), tot.missingJust, tot.missingJust > 0)] },
+      { k: 'check', go: 'risk', items: [m(t('pdca.m.scan'), withScan + '/' + n, withScan < n), m(t('pdca.m.ver'), tot.verified), m(t('pdca.m.rated'), rated + '/' + rows.length, rated < rows.length)] },
+      { k: 'act', go: 'roadmap', items: [m(t('pdca.m.p1'), p1, p1 > 0), m(t('pdca.m.overdue'), overdue, overdue > 0)] }
+    ];
+    return '<div class="card"><h2>' + esc(t('pdca.title')) + '</h2><p class="small muted">' + esc(t('pdca.sub')) + '</p><div class="pdca">' + phases.map(function (ph) {
+      return '<a class="pdca-step pdca-' + ph.k + '" href="#' + ph.go + '"><div class="pdca-head"><span class="pdca-letter">' + t('pdca.' + ph.k).charAt(0) + '</span><b>' + esc(t('pdca.' + ph.k)) + '</b></div>' +
+        '<p class="small">' + esc(t('pdca.' + ph.k + 'D')) + '</p><ul>' + ph.items.join('') + '</ul><span class="small pdca-go">' + esc(t('pdca.goto')) + ' →</span></a>';
+    }).join('') + '</div></div>';
+  }
 
   /* ---------- Assets ---------- */
   V.assets = function () {
     var h = ['<div class="page-head"><div><h1>' + esc(t('assets.title')) + '</h1><p>' + esc(t('assets.sub')) + '</p></div><button class="btn btn-primary" data-act="newAsset">' + esc(t('btn.newAsset')) + '</button></div>'];
-    if (!state.assets.length) { h.push('<div class="card muted">' + esc(t('dash.noAssets')) + '</div>'); return h.join(''); }
-    h.push('<div class="card"><div class="table-wrap"><table><thead><tr><th>' + esc(t('c.name')) + '</th><th>' + esc(t('c.hostname')) + ' / ' + esc(t('c.ip')) + '</th><th>' + esc(t('c.os')) + '</th><th>' + esc(t('c.role')) +
-      '</th><th>' + esc(t('c.owner')) + '</th><th>' + esc(t('c.libraries')) + '</th><th>' + esc(t('c.approach')) + '</th><th>' + esc(t('c.actions')) + '</th></tr></thead><tbody>');
-    state.assets.forEach(function (a) {
-      h.push('<tr><td><b>' + esc(a.name) + '</b><div class="small muted">' + esc(a.description || '') + '</div></td><td>' + esc(a.hostname || '–') + '<div class="small mono">' + esc(a.ip || '') + '</div></td><td>' +
-        esc(tx(HA.osById(a.os))) + (a.osVersion ? '<div class="small muted">' + esc(a.osVersion) + '</div>' : '') + '</td><td>' + esc(t('c.' + assetRole(a))) + '</td><td>' + esc(a.owner || '–') + '</td><td>' +
-        a.libs.map(libBadge).join(' ') + '</td><td class="small">' + esc(t('approach.' + a.approach).split(' (')[0]) + '</td><td class="nowrap">' +
-        '<button class="btn btn-sm" data-act="openAsset" data-id="' + a.id + '">✅</button> <button class="btn btn-sm" data-act="editAsset" data-id="' + a.id + '">' + esc(t('btn.edit')) + '</button> ' +
-        '<button class="btn btn-sm" data-act="dupAsset" data-id="' + a.id + '" title="' + esc(t('btn.duplicate')) + '">⧉</button> <button class="btn btn-sm btn-danger" data-act="delAsset" data-id="' + a.id + '" aria-label="' + esc(t('btn.delete')) + '">🗑</button></td></tr>');
+    if (!state.assets.length) h.push('<div class="card muted">' + esc(t('dash.noAssets')) + '</div>');
+    // Übersicht der Geltungsbereiche (Zielobjekt-Typen) mit Schnellanlage
+    h.push('<div class="kind-bar no-print">' + HA.GS.KINDS.map(function (k) {
+      var n = state.assets.filter(function (a) { return assetKind(a) === k.id; }).length;
+      return '<button type="button" class="kind-pill' + (n ? ' has' : '') + '" data-act="newAsset" data-kind="' + k.id + '" title="' + esc(tx(k.hint)) + '"><span>' + k.icon + '</span> ' + esc(tx(k)) +
+        ' <b>' + n + '</b><i>+</i></button>'; }).join('') + '</div>');
+    kindGroups().forEach(function (g) {
+      var sys = g.kind.id === 'system';
+      h.push('<div class="card"><div class="row"><h2 style="margin:0">' + g.kind.icon + ' ' + esc(tx(g.kind)) + ' <span class="muted small">(' + g.assets.length + ')</span></h2><span class="spacer"></span>' +
+        '<span class="small muted">' + esc(L2('Schichten: ', 'Layers: ') + g.kind.layers.join(', ')) + '</span><button class="btn btn-sm" data-act="newAsset" data-kind="' + g.kind.id + '">+ ' + esc(L2('Hinzufügen', 'Add')) + '</button></div>' +
+        '<div class="table-wrap"><table><thead><tr><th>' + esc(t('c.name')) + '</th><th>' + esc(sys ? t('c.hostname') + ' / ' + t('c.ip') : L2('Kennung / Details', 'Identifier / details')) + '</th>' +
+        (sys ? '<th>' + esc(t('c.os')) + '</th><th>' + esc(t('c.role')) + '</th>' : '') + '<th>' + esc(t('c.owner')) + '</th><th>' + esc(L2('Bibliotheken / Bausteine', 'Libraries / modules')) + '</th><th>' + esc(t('c.approach')) + '</th><th>' + esc(t('c.actions')) + '</th></tr></thead><tbody>');
+      g.assets.forEach(function (a) {
+        h.push('<tr><td><b>' + esc(a.name) + '</b><div class="small muted">' + esc(a.description || '') + '</div></td><td>' + esc(a.hostname || '–') + '<div class="small ' + (sys ? 'mono' : 'muted') + '">' + esc(a.ip || '') + '</div>' +
+          (!sys && a.osVersion ? '<div class="small muted">' + esc(a.osVersion) + '</div>' : '') + '</td>' +
+          (sys ? '<td>' + esc(tx(HA.osById(a.os))) + (a.osVersion ? '<div class="small muted">' + esc(a.osVersion) + '</div>' : '') + '</td><td>' + esc(t('c.' + assetRole(a))) + '</td>' : '') +
+          '<td>' + esc(a.owner || '–') + '</td><td>' + modelCell(a) + '</td><td class="small">' + esc(t('approach.' + a.approach).split(' (')[0]) + '</td><td class="nowrap">' +
+          '<button class="btn btn-sm" data-act="openAsset" data-id="' + a.id + '">✅</button> <button class="btn btn-sm" data-act="editAsset" data-id="' + a.id + '">' + esc(t('btn.edit')) + '</button> ' +
+          '<button class="btn btn-sm" data-act="dupAsset" data-id="' + a.id + '" title="' + esc(t('btn.duplicate')) + '">⧉</button> <button class="btn btn-sm btn-danger" data-act="delAsset" data-id="' + a.id + '" aria-label="' + esc(t('btn.delete')) + '">🗑</button></td></tr>');
+      });
+      h.push('</tbody></table></div></div>');
     });
-    h.push('</tbody></table></div></div>');
     return h.join('');
   };
 
-  /** Dialog zum Anlegen/Bearbeiten eines Assets. */
-  function editAsset(asset) {
+  /* Feldbeschriftungen je Zielobjekt-Typ: host / ip / ver (null = Feld ausblenden) */
+  var KIND_FIELDS = {
+    system: { host: ['Hostname', 'Hostname'], ip: ['IP-Adresse(n)', 'IP address(es)'], ver: ['Version', 'Version'] },
+    org: { host: ['Kurzbezeichnung / Geltungsbereich', 'Short name / scope'], ip: null, ver: null },
+    app: { host: ['URL / Host', 'URL / host'], ip: ['Server / Plattform', 'Server / platform'], ver: ['Produkt / Version', 'Product / version'] },
+    ind: { host: ['Anlagenkennzeichen', 'Plant identifier'], ip: ['IP / Feldbus', 'IP / fieldbus'], ver: ['Hersteller / Typ', 'Vendor / type'] },
+    net: { host: ['Netz / VLAN', 'Network / VLAN'], ip: ['IP-Bereich', 'IP range'], ver: ['Komponenten', 'Components'] },
+    inf: { host: ['Gebäude / Raum-Nr.', 'Building / room no.'], ip: null, ver: ['Ausstattung', 'Equipment'] }
+  };
+  /** Anzahl verfügbarer Einzelanforderungen je Baustein (eingebaut + importiert). */
+  function reqCounts() {
+    var c = {}; allItems().forEach(function (it) { if (it.lib === 'gsmod' || it.lib === 'custom') return; var b = bausteinOf(it); if (b) c[b] = (c[b] || 0) + 1; });
+    return c;
+  }
+  /** Auswahl der Bausteine (Modellierung), gruppiert nach Schichten. */
+  function modulePicker(mods, kind) {
+    var cnt = reqCounts(), k = HA.GS.kind(kind);
+    return HA.GS.LAYERS.map(function (L) {
+      var list = HA.GS.BAUSTEINE.filter(function (b) { return b.layer === L.id; });
+      var sel = list.filter(function (b) { return mods.indexOf(b.id) >= 0; }).length;
+      return '<details class="mod-layer" data-layer="' + L.id + '"' + (k.layers.indexOf(L.id) >= 0 || sel ? ' open' : '') + '><summary><b>' + L.id + '</b> ' + esc(tx(L)) + ' <span class="badge st-open" data-cnt>' + sel + '/' + list.length + '</span></summary><div class="mod-grid">' +
+        list.map(function (b) {
+          return '<label title="' + esc(tx(b.d)) + '"><input type="checkbox" name="modules" value="' + esc(b.id) + '"' + (mods.indexOf(b.id) >= 0 ? ' checked' : '') + '> <span class="mono">' + esc(b.id) + '</span> ' + esc(tx(b)) +
+            (cnt[b.id] ? ' <span class="muted small">(' + cnt[b.id] + ')</span>' : '') + '</label>';
+        }).join('') + '</div></details>';
+    }).join('');
+  }
+
+  /** Dialog zum Anlegen/Bearbeiten eines Assets (Zielobjekt). */
+  function editAsset(asset, kindPre, modsPre) {
     var isNew = !asset;
     var a = asset || { name: '', hostname: '', ip: '', os: 'debian', osVersion: '', role: '', owner: '', location: '', description: '', approach: 'standard', showH: false,
-      libs: ['bsi2023', 'ssg'], sb: { c: 'normal', i: 'normal', a: 'normal' } };
+      libs: ['bsi2023', 'ssg'], sb: { c: 'normal', i: 'normal', a: 'normal' }, kind: kindPre || 'system', modules: null };
+    var kind = assetKind(a);
+    var mods = a.modules ? a.modules.slice() : (modsPre || HA.GS.defaults(kind, a.os));
     function libChecks(osId) {
       var probe = { os: osId, role: '', libs: usableLibs(), approach: 'kern', sb: {}, id: '_' };
       return usableLibs().map(function (l) {
@@ -350,19 +508,28 @@ HA.App = (function () {
         return '<label><input type="checkbox" name="libs" value="' + esc(l) + '"' + (a.libs.indexOf(l) >= 0 ? ' checked' : '') + '> ' + libBadge(l) + ' ' + esc(tx(getLib(l).name)) + ' <span class="muted small">(' + n + ')</span></label>';
       }).join('<br>');
     }
-    var body = '<div class="grid grid-2">' +
+    function kl(k, f) { var x = (KIND_FIELDS[k] || KIND_FIELDS.system)[f]; return x ? (HA.lang === 'en' ? x[1] : x[0]) : ''; }
+    var body = '<div class="field"><label>' + esc(L2('Zielobjekt-Typ (Geltungsbereich)', 'Target object type (scope)')) + '</label><div class="kind-choice">' + HA.GS.KINDS.map(function (k) {
+        return '<label class="seg-opt"><input type="radio" name="kind" value="' + k.id + '"' + (k.id === kind ? ' checked' : '') + '><span>' + k.icon + ' ' + esc(tx(k)) + '</span></label>'; }).join('') +
+      '</div><div class="small muted" id="kindHint">' + esc(tx(HA.GS.kind(kind).hint)) + '</div></div>' +
+      '<div class="grid grid-2">' +
       '<div class="field"><label>' + esc(t('c.name')) + ' *</label><input type="text" name="name" required value="' + esc(a.name) + '"></div>' +
-      '<div class="field"><label>' + esc(t('c.hostname')) + '</label><input type="text" name="hostname" value="' + esc(a.hostname) + '"></div>' +
-      '<div class="field"><label>' + esc(t('c.ip')) + '</label><input type="text" name="ip" value="' + esc(a.ip) + '" placeholder="10.0.0.10, fe80::1"></div>' +
-      '<div class="field"><label>' + esc(t('c.os')) + '</label><select name="os">' + HA.OS.map(function (o) { return opt(o.id, tx(o), a.os); }).join('') + '</select></div>' +
-      '<div class="field"><label>' + esc(t('c.osVersion')) + '</label><input type="text" name="osVersion" value="' + esc(a.osVersion) + '" placeholder="z. B. 12.8 / 24.04 LTS / 2022 21H2"></div>' +
-      '<div class="field"><label>' + esc(t('c.role')) + '</label><select name="role">' + opt('', '(' + t('c.os') + ')', a.role) + opt('server', t('c.server'), a.role) + opt('client', t('c.client'), a.role) + '</select></div>' +
+      '<div class="field" data-kf="host"><label>' + esc(kl(kind, 'host')) + '</label><input type="text" name="hostname" value="' + esc(a.hostname) + '"></div>' +
+      '<div class="field" data-kf="ip"><label>' + esc(kl(kind, 'ip')) + '</label><input type="text" name="ip" value="' + esc(a.ip) + '"></div>' +
+      '<div class="field" data-kf="sys"><label>' + esc(t('c.os')) + '</label><select name="os">' + HA.OS.map(function (o) { return opt(o.id, tx(o), a.os); }).join('') + '</select></div>' +
+      '<div class="field" data-kf="ver"><label>' + esc(kl(kind, 'ver')) + '</label><input type="text" name="osVersion" value="' + esc(a.osVersion) + '"></div>' +
+      '<div class="field" data-kf="sys"><label>' + esc(t('c.role')) + '</label><select name="role">' + opt('', '(' + t('c.os') + ')', a.role) + opt('server', t('c.server'), a.role) + opt('client', t('c.client'), a.role) + '</select></div>' +
       '<div class="field"><label>' + esc(t('c.owner')) + '</label><input type="text" name="owner" value="' + esc(a.owner) + '"></div>' +
       '<div class="field"><label>' + esc(t('c.location')) + '</label><input type="text" name="location" value="' + esc(a.location) + '"></div></div>' +
       '<div class="field"><label>' + esc(t('c.description')) + '</label><textarea name="description">' + esc(a.description) + '</textarea></div>' +
       '<div class="field"><label>' + esc(t('c.approach')) + '</label><select name="approach">' + ['basis', 'standard', 'kern'].map(function (x) { return opt(x, t('approach.' + x), a.approach); }).join('') +
       '</select><div class="small muted">' + esc(t('assets.approachHint')) + '</div><label style="font-weight:400;margin-top:.3rem"><input type="checkbox" name="showH"' + (a.showH ? ' checked' : '') + '> ' + esc(t('assets.showH')) + '</label></div>' +
-      '<div class="field"><label>' + esc(t('c.libraries')) + '</label><div class="small muted">' + esc(t('assets.libsHint')) + '</div><div id="libChecks" class="small">' + libChecks(a.os) + '</div></div>';
+      '<div class="field"><label>' + esc(L2('Modellierung: IT-Grundschutz-Bausteine', 'Modelling: IT-Grundschutz modules')) + '</label><div class="small muted">' +
+      esc(L2('Welche Bausteine gelten für dieses Zielobjekt? (Zahl) = vorhandene Einzelanforderungen; ohne Einzelanforderungen erscheint eine Baustein-Gesamtbewertung. Bei IT-Systemen ohne Auswahl gilt die automatische Zuordnung nach Betriebssystem.',
+        'Which modules apply to this target object? (number) = available individual requirements; without them an overall module assessment is shown. For IT systems without selection, automatic assignment by OS applies.')) +
+      '</div><div class="row" style="margin:.3rem 0">' + '<button type="button" class="btn btn-sm" data-mp="def">' + esc(L2('Vorschlag übernehmen', 'Apply suggestion')) + '</button><button type="button" class="btn btn-sm" data-mp="none">' + esc(L2('Keine', 'None')) + '</button>' +
+      '<input type="search" data-mp="q" placeholder="' + esc(L2('Baustein suchen …', 'Search module …')) + '" style="max-width:220px"></div><div id="modPicker" class="mod-picker">' + modulePicker(mods, kind) + '</div></div>' +
+      '<div class="field" data-kf="sys"><label>' + esc(t('c.libraries')) + '</label><div class="small muted">' + esc(t('assets.libsHint')) + '</div><div id="libChecks" class="small">' + libChecks(a.os) + '</div></div>';
     var form = dialog(isNew ? t('assets.new') : t('assets.edit'), body, function (f) {
       var fd = new FormData(f);
       var name = (fd.get('name') || '').trim();
@@ -370,20 +537,72 @@ HA.App = (function () {
       var target = asset || { id: uid('a'), checks: {}, scans: [], sb: a.sb, created: new Date().toISOString() };
       ['name', 'hostname', 'ip', 'os', 'osVersion', 'role', 'owner', 'location', 'description', 'approach'].forEach(function (k) { target[k] = (fd.get(k) || '').trim(); });
       target.showH = !!fd.get('showH');
-      target.libs = fd.getAll('libs');
+      target.kind = fd.get('kind') || 'system';
+      target.modules = fd.getAll('modules');
+      target.libs = target.kind === 'system' ? fd.getAll('libs') : (target.libs || a.libs || []).filter(function (l) { return l === 'custom'; });
       if (isNew) state.assets.push(target);
       ui.assetId = target.id;
-      scheduleSave(); render();
+      invalidate(); scheduleSave(); render();
     }, t('btn.apply'));
-    // Bibliotheks-Zählung aktualisieren, wenn das Betriebssystem gewechselt wird
-    form.querySelector('[name=os]').addEventListener('change', function (e) {
-      a.libs = Array.prototype.map.call(form.querySelectorAll('[name=libs]:checked'), function (x) { return x.value; });
-      a.role = form.querySelector('[name=role]').value;
-      var fam = HA.osById(e.target.value).family;
-      if (fam === 'windows' && a.libs.indexOf('msbaseline') < 0) a.libs.push('msbaseline');
-      if (fam === 'macos' && a.libs.indexOf('mscp') < 0) a.libs.push('mscp');
-      form.querySelector('#libChecks').innerHTML = libChecks(e.target.value);
+    form.classList.add('dlg-wide');
+    function checked() { return Array.prototype.map.call(form.querySelectorAll('[name=modules]:checked'), function (x) { return x.value; }); }
+    function setMods(list) {
+      form.querySelectorAll('[name=modules]').forEach(function (x) { x.checked = list.indexOf(x.value) >= 0; });
+      counts();
+    }
+    function counts() {
+      form.querySelectorAll('.mod-layer').forEach(function (d) { var all = d.querySelectorAll('[name=modules]'), on = d.querySelectorAll('[name=modules]:checked'); d.querySelector('[data-cnt]').textContent = on.length + '/' + all.length; });
+    }
+    function curKind() { var r = form.querySelector('[name=kind]:checked'); return r ? r.value : 'system'; }
+    /** Felder passend zum Zielobjekt-Typ ein-/ausblenden und beschriften. */
+    function applyKind(k) {
+      form.querySelectorAll('[data-kf]').forEach(function (el) {
+        var f = el.getAttribute('data-kf');
+        if (f === 'sys') { el.hidden = k !== 'system'; return; }
+        var lbl = kl(k, f); el.hidden = !lbl; if (lbl) el.querySelector('label').textContent = lbl;
+      });
+      form.querySelector('#kindHint').textContent = tx(HA.GS.kind(k).hint);
+      var layers = HA.GS.kind(k).layers;
+      form.querySelectorAll('.mod-layer').forEach(function (d) { if (layers.indexOf(d.getAttribute('data-layer')) >= 0) d.open = true; });
+    }
+    applyKind(kind);
+    form.addEventListener('change', function (e) {
+      var el = e.target;
+      if (el.name === 'kind') {
+        var k = el.value;
+        // Vorschlag übernehmen, solange noch keine eigene Auswahl getroffen wurde
+        var cur = checked(), prevDef = HA.GS.defaults(kind, form.querySelector('[name=os]').value);
+        if (!cur.length || cur.join() === prevDef.join()) setMods(HA.GS.defaults(k, form.querySelector('[name=os]').value));
+        kind = k; applyKind(k);
+      } else if (el.name === 'modules') counts();
+      else if (el.name === 'os') {
+        // Bibliotheks-Zählung und OS-abhängige SYS-Bausteine aktualisieren
+        a.libs = Array.prototype.map.call(form.querySelectorAll('[name=libs]:checked'), function (x) { return x.value; });
+        a.role = form.querySelector('[name=role]').value;
+        var fam = HA.osById(el.value).family;
+        if (fam === 'windows' && a.libs.indexOf('msbaseline') < 0) a.libs.push('msbaseline');
+        if (fam === 'macos' && a.libs.indexOf('mscp') < 0) a.libs.push('mscp');
+        form.querySelector('#libChecks').innerHTML = libChecks(el.value);
+        if (curKind() === 'system') {
+          var m = checked().filter(function (x) { return HA.GS.OS_MODS.indexOf(x) < 0; });
+          setMods(HA.GS.defaults('system', el.value).concat(m));
+        }
+      }
     });
+    form.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-mp]'); if (!b || b.tagName !== 'BUTTON') return;
+      if (b.getAttribute('data-mp') === 'def') setMods(HA.GS.defaults(curKind(), form.querySelector('[name=os]').value));
+      else setMods([]);
+    });
+    form.querySelector('[data-mp=q]').addEventListener('input', function (e) {
+      var q = e.target.value.trim().toLowerCase();
+      form.querySelectorAll('.mod-layer').forEach(function (d) {
+        var any = false;
+        d.querySelectorAll('label').forEach(function (l) { var hit = !q || l.textContent.toLowerCase().indexOf(q) >= 0; l.hidden = !hit; if (hit) any = true; });
+        d.hidden = !any; if (q && any) d.open = true;
+      });
+    });
+    form.querySelector('[data-mp=q]').addEventListener('keydown', function (e) { if (e.key === 'Enter') e.preventDefault(); });
   }
 
   /* ---------- Schutzbedarf ---------- */
@@ -391,9 +610,10 @@ HA.App = (function () {
     var h = ['<div class="page-head"><div><h1>' + esc(t('prot.title')) + '</h1><p>' + esc(t('prot.sub')) + '</p></div></div>',
       '<div class="note">' + esc(t('prot.help')) + '<br>' + esc(t('prot.ssgHint')) + '</div>'];
     if (!state.assets.length) { h.push('<div class="card muted">' + esc(t('dash.noAssets')) + '</div>'); return h.join(''); }
-    state.assets.forEach(function (a) {
+    var multi = kindGroups().length > 1;
+    kindGroups().forEach(function (g) { if (multi) h.push('<h2 class="group-title">' + g.kind.icon + ' ' + esc(tx(g.kind)) + '</h2>'); g.assets.forEach(function (a) {
       var ov = overallProtection(a);
-      h.push('<div class="card"><div class="row"><h2 style="margin:0">' + esc(a.name) + '</h2><span class="muted small">' + esc(tx(HA.osById(a.os))) + '</span><span class="spacer"></span>' +
+      h.push('<div class="card"><div class="row"><h2 style="margin:0">' + esc(a.name) + '</h2><span class="muted small">' + typeCell(a) + '</span><span class="spacer"></span>' +
         '<span>' + esc(t('prot.overall')) + ': <b class="badge ' + (ov === 'normal' ? 'lvl-B' : ov === 'high' ? 'fs-accepted' : 'lvl-H') + '">' + esc(t('prot.' + ov)) + '</b></span></div>' +
         '<div class="small muted" style="margin:.3rem 0 .6rem">' + esc(t('prot.effect')) + ': ' + esc(ov === 'normal' && !a.showH && a.approach !== 'kern' ? t('prot.effectNormal') : t('prot.effectHigh')) + ' · ' + esc(t('approach.' + a.approach)) + '</div>');
       h.push('<div class="table-wrap"><table><tbody>');
@@ -405,7 +625,7 @@ HA.App = (function () {
           (!a.sb[k + 'Note'] ? ' class="invalid" title="' + esc(t('prot.missingReason')) + '"' : '') + '>' + esc(a.sb[k + 'Note'] || '') + '</textarea></td></tr>');
       });
       h.push('</tbody></table></div><div class="row end" style="margin-top:.5rem"><button class="btn btn-sm" data-act="openAsset" data-id="' + a.id + '">' + esc(t('btn.openChecklist')) + ' →</button></div></div>');
-    });
+    }); });
     return h.join('');
   };
 
@@ -428,15 +648,19 @@ HA.App = (function () {
     });
     // Kopf mit Asset-Auswahl und Fortschritt
     h.push('<div class="card"><div class="grid grid-2"><div><label for="clAsset">' + esc(t('cl.selectAsset')) + '</label>' + assetSelect('clAsset', a.id) +
-      '<div class="small muted" style="margin-top:.4rem">' + esc(tx(HA.osById(a.os))) + ' · ' + esc(t('c.' + assetRole(a))) + ' · ' + esc(t('nav.protection')) + ': <b>' + esc(t('prot.' + overallProtection(a))) + '</b> · ' + esc(t('approach.' + a.approach).split(' (')[0]) +
-      ' · <a href="#assets" data-act="editAsset" data-id="' + a.id + '">' + esc(t('btn.edit')) + '</a></div><div style="margin-top:.3rem">' + a.libs.map(libBadge).join(' ') + '</div></div>' +
+      '<div class="small muted" style="margin-top:.4rem">' + (assetKind(a) === 'system' ? esc(tx(HA.osById(a.os))) + ' · ' + esc(t('c.' + assetRole(a))) : esc(kindLabel(a))) + ' · ' + esc(t('nav.protection')) + ': <b>' + esc(t('prot.' + overallProtection(a))) + '</b> · ' + esc(t('approach.' + a.approach).split(' (')[0]) +
+      ' · <a href="#assets" data-act="editAsset" data-id="' + a.id + '">' + esc(t('btn.edit')) + '</a></div><div style="margin-top:.3rem">' + modelCell(a) + '</div></div>' +
       '<div><div class="row"><b style="font-size:1.4rem">' + s.pct + ' %</b><span class="muted small">' + s.done + ' ' + esc(t('status.done')) + ' · ' + s.partial + ' ' + esc(t('status.partial')) + ' · ' + s.notdone + ' ' + esc(t('status.notdone')) +
       ' · ' + s.na + ' ' + esc(t('status.na')) + ' · ' + s.open + ' ' + esc(t('status.open')) + ' · ' + s.verified + ' ' + esc(t('verify.effective')) + '</span></div>' + progressBar(s) + legend() +
       (allNoLevel.length > all.length ? '<div class="small muted" style="margin-top:.3rem">ℹ ' + (allNoLevel.length - all.length) + ' ' + esc(HA.lang === 'de' ? 'Maßnahmen höherer Niveaus durch Vorgehensweise/Schutzbedarf ausgeblendet.' : 'higher-level measures hidden by approach/protection needs.') + '</div>' : '') +
       (s.missingJust ? '<div class="small" style="color:var(--danger);margin-top:.3rem">⚠ ' + s.missingJust + ' × ' + esc(t('cl.justReq')) + '</div>' : '') + '</div></div></div>');
-    if (!a.libs.length) h.push('<div class="note warn">' + esc(t('cl.noLibs')) + '</div>');
+    if (assetKind(a) === 'system' && !a.libs.length && !(a.modules || []).length) h.push('<div class="note warn">' + esc(t('cl.noLibs')) + '</div>');
+    if (assetKind(a) !== 'system' && !(a.modules || []).length) h.push('<div class="note warn">' + esc(L2('Für dieses Zielobjekt sind noch keine Bausteine modelliert – unter „Bearbeiten“ Bausteine auswählen.', 'No modules modelled for this target object yet – select modules under "Edit".')) + '</div>');
+    var virt = all.filter(function (it) { return it.lib === 'gsmod'; });
+    if (virt.length) h.push('<div class="note">ℹ ' + esc(L2(virt.length + ' modellierte Bausteine ohne Einzelanforderungen werden als Baustein-Gesamtbewertung geführt (' + virt.map(function (x) { return x.ref; }).join(', ') + '). Für die Einzelanforderungen das IT-Grundschutz-Kompendium (XML) unter „Import“ laden oder mit „+ Eigene Maßnahme“ Anforderungen zum Baustein ergänzen.',
+      virt.length + ' modelled modules without individual requirements are shown as overall module assessment (' + virt.map(function (x) { return x.ref; }).join(', ') + '). For individual requirements import the IT-Grundschutz compendium (XML) or add requirements via "+ Custom measure".')) + '</div>');
     // Filterleiste
-    var libsInAsset = a.libs.concat(state.customItems.some(function (c) { return c.assetId === a.id; }) && a.libs.indexOf('custom') < 0 ? ['custom'] : []);
+    var libsInAsset = []; allNoLevel.forEach(function (it) { if (libsInAsset.indexOf(it.lib) < 0) libsInAsset.push(it.lib); });
     h.push('<div class="card sticky-bar no-print"><div class="filters">' +
       '<div><label for="fQ">' + esc(t('c.search')) + '</label><input type="search" id="fQ" data-act="fQ" value="' + esc(f.q) + '" placeholder="SYS.1.3.A8, ssh, …"></div>' +
       '<div><label for="fLib">' + esc(t('c.library')) + '</label><select id="fLib" data-act="filter" data-f="lib">' + opt('', t('c.all'), f.lib) + libsInAsset.map(function (l) { return opt(l, getLib(l).short, f.lib); }).join('') + '</select></div>' +
@@ -455,6 +679,10 @@ HA.App = (function () {
       if (!groups[g]) { groups[g] = []; order.push(g); }
       groups[g].push(it);
     });
+    if (f.groupBy === 'group') {   // Grundschutz-Bausteine in der Reihenfolge des Schichtenmodells
+      var pos = {}; order.forEach(function (g, i) { var bs = bausteinOf(groups[g][0]); pos[g] = bs && groupLabel(groups[g][0]) === g ? HA.GS.index(bs) : 1000 + i; });
+      order.sort(function (x, y) { return pos[x] - pos[y]; });
+    }
     order.forEach(function (g) {
       var gi = groups[g]; var done = gi.filter(function (it) { return getCheck(a, it).status === 'done'; }).length;
       h.push('<h3 class="group-title">' + esc(g) + ' <span class="badge st-open">' + done + '/' + gi.length + '</span></h3>');
@@ -533,13 +761,16 @@ HA.App = (function () {
       '<div class="field"><label>' + esc(t('c.description')) + '</label><textarea name="desc">' + esc(pre.desc || '') + '</textarea></div>' +
       '<div class="grid grid-2"><div class="field"><label>' + esc(t('c.topic')) + '</label><select name="topic">' + HA.TOPICS.map(function (x) { return opt(x.id, tx(x), pre.topic || 'install'); }).join('') + '</select></div>' +
       '<div class="field"><label>' + esc(t('cl.check')) + ' (' + fam + ')</label><input type="text" name="check" value="' + esc(pre.check || '') + '"></div></div>' +
+      (a && (a.modules || []).length ? '<div class="field"><label>' + esc(L2('Zu Baustein (Modellierung)', 'For module (modelling)')) + '</label><select name="bs">' + opt('', '–', pre.bs || '') +
+        a.modules.map(function (m) { return opt(m, m + ' ' + HA.GS.title(m), pre.bs || ''); }).join('') + '</select><div class="small muted">' +
+        esc(L2('Eigene Anforderungen erscheinen in der Checkliste unter dem Baustein (z. B. ISMS.1.A-ORG1).', 'Custom requirements appear in the checklist under the module (e.g. ISMS.1.A-ORG1).')) + '</div></div>' : '') +
       '<div class="field"><label><input type="checkbox" name="all"' + (pre.all ? ' checked' : '') + '> ' + esc(HA.lang === 'de' ? 'Für alle Assets mit Bibliothek „Eigene“ (sonst nur dieses Asset)' : 'For all assets with library "Custom" (otherwise this asset only)') + '</label></div>';
     dialog(t('cl.customTitle'), body, function (f) {
       var fd = new FormData(f);
       if (!(fd.get('title') || '').trim()) { f.querySelector('[name=title]').classList.add('invalid'); return false; }
       var chk = null; if (fd.get('check')) { chk = {}; chk[fam] = fd.get('check'); }
       var it = { lib: 'custom', ref: (fd.get('ref') || '').trim() || uid('CUS'), title: { de: fd.get('title').trim(), en: fd.get('title').trim() }, desc: { de: fd.get('desc') || '' },
-        level: fd.get('level'), topic: fd.get('topic'), os: [fam], role: 'any', check: chk, group: t('cl.customTitle'), assetId: fd.get('all') ? null : (a && a.id), source: pre.source || '' };
+        level: fd.get('level'), topic: fd.get('topic'), os: [fam], role: 'any', check: chk, group: fd.get('bs') || t('cl.customTitle'), assetId: fd.get('all') ? null : (a && a.id), source: pre.source || '' };
       if (state.customItems.some(function (x) { return x.ref === it.ref && x.assetId === it.assetId; })) it.ref += '-' + Math.random().toString(36).slice(2, 5);
       state.customItems.push(it);
       if (fd.get('all') && a && a.libs.indexOf('custom') < 0) a.libs.push('custom');
@@ -892,7 +1123,7 @@ HA.App = (function () {
       return '<div class="card stat" style="border-top:4px solid ' + R.COLORS[R.CATS[3 - i]] + '"><div class="value">' + n + '</div><div class="label">' + p.toUpperCase() + ' · ' + esc(t('rm.' + p)) + (od ? ' · <span style="color:var(--danger)">' + od + ' ' + esc(t('rm.overdue')) + '</span>' : '') + '</div></div>';
     }).join('') + '</div>');
     h.push('<div class="card no-print"><div class="filters"><div><label>' + esc(t('c.asset')) + '</label><select data-act="rmFilter" data-k="asset">' + opt('', t('c.all'), f.asset) + state.assets.map(function (a) { return opt(a.id, a.name, f.asset); }).join('') + '</select></div>' +
-      '<div><label>' + esc(t('rm.source')) + '</label><select data-act="rmFilter" data-k="kind">' + opt('', t('c.all'), f.kind) + ['finding', 'measure', 'project'].map(function (k) { return opt(k, t('rm.kind.' + k), f.kind); }).join('') + '</select></div>' +
+      '<div><label>' + esc(t('rm.source')) + '</label><select data-act="rmFilter" data-k="kind">' + opt('', t('c.all'), f.kind) + ['finding', 'measure', 'project'].concat(HA.Risk.roadmapKinds).map(function (k) { return opt(k, t('rm.kind.' + k), f.kind); }).join('') + '</select></div>' +
       '<div class="checks" style="align-self:end"><label><input type="checkbox" data-act="rmFilter" data-k="overdue"' + (f.overdue ? ' checked' : '') + '> ' + esc(t('rm.overdue')) + '</label></div></div><p class="small muted" style="margin:.5rem 0 0">' + esc(t('rm.prioHint')) + '</p></div>');
     if (!list.length) { h.push('<div class="card note ok">' + esc(t('rm.empty')) + '</div>'); return h.join(''); }
     R.PHASES.forEach(function (p, i) {
@@ -918,6 +1149,7 @@ HA.App = (function () {
       var a = state.assets.find(function (x) { return x.id === set.assetId; });
       if (a) { a.checks[set.key] = Object.assign({}, a.checks[set.key] || {}); a.checks[set.key][k === 'owner' ? 'responsible' : 'due'] = value; }
     } else if (set.type === 'project') { var pr = state.projectRisks.find(function (x) { return x.id === set.id; }); if (pr) pr[k] = value; }
+    else if (HA.Risk.roadmapWriters[set.type]) HA.Risk.roadmapWriters[set.type](state, set, k, value);
     scheduleSave();
   }
 
@@ -990,14 +1222,17 @@ HA.App = (function () {
     h.push('<div class="card"><div class="grid grid-2"><div><label for="repAsset">' + esc(t('rep.scope')) + '</label><select id="repAsset" data-act="repOpt" data-k="asset">' + opt('all', t('rep.allAssets'), r.asset) +
       state.assets.map(function (a) { return opt(a.id, a.name, r.asset); }).join('') + '</select></div><div class="checks" style="align-self:end">' +
       [['open', 'rep.optOpen'], ['findings', 'rep.optFindings'], ['desc', 'rep.optDesc'], ['cmds', 'rep.optCmds'], ['tom', 'rep.optTom'], ['risk', 'rep.optRisk'], ['pm', 'rep.optPm'], ['swot', 'rep.optSwot'], ['roadmap', 'rep.optRoadmap']].map(function (x) {
-        return '<label><input type="checkbox" data-act="repOpt" data-k="' + x[0] + '"' + (r[x[0]] ? ' checked' : '') + '> ' + esc(t(x[1])) + '</label>'; }).join('') + '</div></div>' +
+        return '<label><input type="checkbox" data-act="repOpt" data-k="' + x[0] + '"' + (r[x[0]] ? ' checked' : '') + '> ' + esc(t(x[1])) + '</label>'; }).join('') +
+      EXT.reportOpts.map(function (x) { if (r[x.key] === undefined) r[x.key] = x.def !== false;
+        return '<label><input type="checkbox" data-act="repOpt" data-k="' + x.key + '"' + (r[x.key] ? ' checked' : '') + '> ' + esc(tx(x.label)) + '</label>'; }).join('') + '</div></div>' +
       '<div class="row" style="margin-top:.8rem"><button class="btn btn-primary" data-act="genReport">' + esc(t('btn.generate')) + '</button><button class="btn" data-act="printReport">🖨 ' + esc(t('btn.print')) + '</button><button class="btn" data-act="dlReport">⬇ ' + esc(t('btn.download')) + '</button></div></div>');
     h.push('<div class="card"><h2>' + esc(t('rep.preview')) + '</h2><iframe id="repFrame" class="report-frame" title="' + esc(t('rep.preview')) + '"></iframe></div>');
     return h.join('');
   };
   function reportHtml() {
     var r = ui.report;
-    return HA.Report.build(state, { assetIds: r.asset === 'all' ? null : [r.asset], includeCmds: r.cmds, includeOpen: r.open, includeFindings: r.findings, includeDesc: r.desc, includeRisk: r.risk, includePm: r.pm, includeSwot: r.swot, includeRoadmap: r.roadmap, includeTom: r.tom });
+    return HA.Report.build(state, { assetIds: r.asset === 'all' ? null : [r.asset], includeCmds: r.cmds, includeOpen: r.open, includeFindings: r.findings, includeDesc: r.desc, includeRisk: r.risk, includePm: r.pm, includeSwot: r.swot, includeRoadmap: r.roadmap, includeTom: r.tom,
+      ext: EXT.reportOpts.reduce(function (o, x) { o[x.key] = r[x.key] !== undefined ? r[x.key] : x.def !== false; return o; }, {}) });
   }
   function showReport() { var f = document.getElementById('repFrame'); if (f) f.srcdoc = state.assets.length ? reportHtml() : '<p style="font-family:sans-serif;padding:2rem">' + esc(t('dash.noAssets')) + '</p>'; }
 
@@ -1013,6 +1248,7 @@ HA.App = (function () {
       '<div class="field"><label>' + esc(t('set.staleDays')) + '</label><input type="number" min="1" data-field="meta" data-k="staleDays" value="' + esc(m.staleDays) + '"></div>' +
       '<div class="field"><label>' + esc(t('set.storageMode')) + '</label><div>' + esc(t('store.' + HA.Storage.mode())) + '</div></div></div></div>');
     h.push(brandCard());
+    EXT.settingsCards.forEach(function (fn) { h.push(fn()); });
     h.push('<div class="card"><h2>' + esc(t('set.data')) + '</h2><div class="row"><button class="btn" data-act="export">💾 ' + esc(t('set.export')) + '</button><button class="btn" data-act="load">📂 ' + esc(t('set.import')) + '</button>' +
       '<button class="btn btn-danger" data-act="wipe">🗑 ' + esc(t('set.wipe')) + '</button></div><div class="note" style="margin-top:1rem">' + esc(t('set.privacy')) + '</div></div>');
     h.push('<div class="card small"><h2>' + esc(HA.lang === 'de' ? 'Quellen & Lizenzen' : 'Sources & licences') + '</h2><ul>' + HA.LIBRARIES.filter(function (l) { return l.url; }).map(function (l) {
@@ -1031,11 +1267,12 @@ HA.App = (function () {
   function applyBranding() {
     var B = state.meta.brand || {}, root = document.documentElement;
     var brand = document.querySelector('.topbar .brand'); if (!brand) return;
-    var svg = brand.querySelector('svg'), img = brand.querySelector('img.brand-logo');
-    if (B.logo && B.logoInApp) {
-      if (!img) { img = document.createElement('img'); img.className = 'brand-logo'; img.alt = 'Logo'; brand.insertBefore(img, brand.firstChild); }
-      img.src = B.logo; svg.style.display = 'none';
-    } else { if (img) img.remove(); svg.style.display = ''; }
+    // Eigenes Logo (falls hochgeladen und gewünscht), sonst Standardlogo „Little RiskBee“
+    var img = document.getElementById('appLogo');
+    var custom = !!(B.logo && B.logoInApp);
+    img.src = custom ? B.logo : (HA.DEFAULT_LOGO || 'assets/little-riskbee.svg');
+    img.alt = custom ? (state.meta.org || 'Logo') : 'Little RiskBee';
+    img.classList.toggle('custom', custom);
     var sub = brand.querySelector('.brand-sub');
     if (sub) sub.textContent = state.meta.org ? state.meta.org + (B.subtitle ? ' · ' + B.subtitle : '') : t('app.subtitle');
     if (B.useInApp && /^#[0-9a-f]{6}$/i.test(B.color || '')) {
@@ -1070,7 +1307,7 @@ HA.App = (function () {
     var org = [m.org ? '<b>' + esc(m.org) + '</b>' : '', esc(B.subtitle), esc(B.address).replace(/\n/g, '<br>'), esc(B.contact), esc(B.web)].filter(Boolean).join('<br>');
     var accent = /^#[0-9a-f]{6}$/i.test(B.color || '') ? B.color : '#0b3d91';
     return '<div class="card"><h2>' + esc(t('brand.title')) + '</h2><div class="grid grid-2"><div>' +
-      '<label>' + esc(t('brand.logo')) + '</label><div class="row" style="align-items:flex-start"><div class="logo-preview">' + (B.logo ? '<img src="' + esc(B.logo) + '" alt="Logo">' : '<span class="muted small">–</span>') + '</div>' +
+      '<label>' + esc(t('brand.logo')) + '</label><div class="row" style="align-items:flex-start"><div class="logo-preview">' + '<img src="' + esc(B.logo || HA.DEFAULT_LOGO) + '" alt="Logo"' + (B.logo ? '' : ' title="Standardlogo Little RiskBee"') + '></div>' +
       '<div class="row" style="flex-direction:column;align-items:stretch"><button class="btn" data-act="brandUpload">⬆ ' + esc(t('brand.upload')) + '</button>' + (B.logo ? '<button class="btn btn-danger" data-act="brandRemove">' + esc(t('brand.remove')) + '</button>' : '') + '</div></div>' +
       '<input type="file" id="fileLogo" data-act="logoFile" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml" hidden>' +
       '<p class="small muted" style="margin-top:.4rem">' + esc(t('brand.logoHint')) + '</p>' +
@@ -1083,7 +1320,7 @@ HA.App = (function () {
       }).join('') +
       '<div class="field"><label>' + esc(t('brand.address')) + '</label><textarea data-field="brand" data-k="address" rows="2">' + esc(B.address || '') + '</textarea></div></div></div>' +
       '<h3 style="margin-top:1rem">' + esc(t('brand.preview')) + '</h3><div style="background:#fff;color:#111;border:1px solid #ccd;border-top:10px solid ' + esc(accent) + ';border-radius:6px;padding:1rem 1.2rem;max-width:760px">' +
-      '<div style="display:flex;justify-content:space-between;gap:1rem;align-items:flex-start">' + (B.logo ? '<img src="' + esc(B.logo) + '" alt="" style="max-height:60px;max-width:200px;object-fit:contain">' : '<span></span>') +
+      '<div style="display:flex;justify-content:space-between;gap:1rem;align-items:flex-start"><img src="' + esc(B.logo || HA.DEFAULT_LOGO) + '" alt="" style="max-height:60px;max-width:200px;object-fit:contain">' +
       '<div style="text-align:right;font-size:.8rem;line-height:1.45">' + (org || '<span style="color:#888">' + esc(t('set.org')) + '</span>') + '</div></div>' +
       '<div style="font-size:1.35rem;font-weight:700;color:' + esc(accent) + ';margin-top:.8rem">' + esc(B.reportTitle || (HA.lang === 'de' ? 'Härtungsbericht und Wirksamkeitskontrolle' : 'Hardening report and effectiveness review')) + '</div></div></div>';
   }
@@ -1097,6 +1334,8 @@ HA.App = (function () {
     view.innerHTML = (V[ui.view] || V.dashboard)();
     document.querySelectorAll('.sidebar a').forEach(function (a) { a.classList.toggle('active', a.getAttribute('data-view') === ui.view); });
     if (ui.view === 'report') showReport();
+    decoratePersons(view);
+    EXT.afterRender.forEach(function (fn) { fn(ui.view); });
     if (keepScroll) window.scrollTo(0, scroll); else window.scrollTo(0, 0);
   }
   function go(view) { ui.view = view; if (location.hash !== '#' + view) history.replaceState(null, '', '#' + view); render(); closeMenu(); }
@@ -1290,9 +1529,10 @@ HA.App = (function () {
   function onClick(e) {
     var el = e.target.closest('[data-act]'); if (!el) return;
     var act = el.getAttribute('data-act'), id = el.getAttribute('data-id');
+    if (runExt(EXT.click, act, el, e)) return;
     var a = currentAsset();
     switch (act) {
-      case 'newAsset': e.preventDefault(); editAsset(null); break;
+      case 'newAsset': e.preventDefault(); editAsset(null, el.getAttribute('data-kind')); break;
       case 'editAsset': e.preventDefault(); editAsset(state.assets.find(function (x) { return x.id === id; })); break;
       case 'openAsset': e.preventDefault(); ui.assetId = id; go('checklist'); break;
       case 'dupAsset': {
@@ -1436,6 +1676,7 @@ HA.App = (function () {
 
   function onChange(e) {
     var el = e.target, act = el.getAttribute('data-act');
+    if (runExt(EXT.change, act || el.getAttribute('data-field'), el, e)) return;
     var a = currentAsset();
     if (act === 'setStatus') {
       var it = findItemByKey(el.getAttribute('data-key'));
@@ -1519,6 +1760,7 @@ HA.App = (function () {
   /** Texteingaben: Zustand aktualisieren, ohne neu zu rendern (Fokus bleibt). */
   function onInput(e) {
     var el = e.target, field = el.getAttribute('data-field'), act = el.getAttribute('data-act');
+    if (runExt(EXT.input, act || field, el, e)) return;
     if (act === 'fQ') { ui.cl.q = el.value; clearTimeout(onInput._t); onInput._t = setTimeout(function () { render(); var s = document.getElementById('fQ'); if (s) { s.focus(); s.setSelectionRange(s.value.length, s.value.length); } }, 350); return; }
     if (act === 'browseQ') { ui.libBrowseQ = el.value; clearTimeout(onInput._b); onInput._b = setTimeout(function () { render(); var s = document.querySelector('[data-act=browseQ]'); if (s) { s.focus(); s.setSelectionRange(s.value.length, s.value.length); } }, 350); return; }
     if (act === 'riskQ') { ui.risk.q = el.value; clearTimeout(onInput._r); onInput._r = setTimeout(function () { render(); var s = document.querySelector('[data-act=riskQ]'); if (s) { s.focus(); s.setSelectionRange(s.value.length, s.value.length); } }, 350); return; }
@@ -1611,7 +1853,13 @@ HA.App = (function () {
   return {
     start: start, applicableItems: applicableItems, checkCmd: checkCmd, getCheck: getCheck, getLib: getLib, assetStats: assetStats,
     overallProtection: overallProtection, openFindings: openFindings, vulnOverall: vulnOverall,
-    _state: function () { return state; }, _ui: ui, _import: applyImport, _takeXccdf: takeXccdf
+    _state: function () { return state; }, _ui: ui, _import: applyImport, _takeXccdf: takeXccdf,
+    // Erweiterungs-API für Module (js/modules/*.js)
+    ext: EXT, views: V, state: function () { return state; }, ui: ui, render: render, go: go, save: scheduleSave, uid: uid,
+    esc: esc, fmtDate: fmtDate, toast: toast, dialog: dialog, confirm: confirmDlg, opt: opt, decoratePersons: decoratePersons,
+    findingRows: function (o) { return HA.Risk.findingRows(state, o || {}); }, roadmap: function (o) { return HA.Risk.roadmap(state, o || {}); },
+    exportState: exportState, applyBranding: applyBranding, invalidate: invalidate, osFamily: osFamily, itemKey: itemKey, allItems: allItems,
+    bausteinOf: bausteinOf, assetKind: assetKind, kindGroups: kindGroups, kindLabel: kindLabel, allowedLevels: allowedLevels, editAsset: editAsset, groupLabel: groupLabel, currentAsset: currentAsset
   };
 })();
 

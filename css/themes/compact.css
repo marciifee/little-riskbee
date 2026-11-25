@@ -1,0 +1,12 @@
+/* =====================================================================
+ * themes/compact.css – Zusatz-Stil „Kompakt“ (Modus: ergänzen)
+ * Dichtere Darstellung für große Bildschirme und lange Tabellen.
+ * ===================================================================== */
+html { font-size: 14px; }
+:root { --gap: .6rem; --radius: 6px; --radius-sm: 4px; }
+.card { padding: .7rem .85rem; margin-bottom: .6rem; }
+.view { padding: .9rem 1.1rem; }
+th, td { padding: .3rem .45rem; }
+.sidebar a { padding: .3rem .6rem; }
+.page-head { margin-bottom: .5rem; }
+.stat .value { font-size: 1.4rem; }

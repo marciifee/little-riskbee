@@ -1,0 +1,38 @@
+/* =====================================================================
+ * themes/honey.css – Zusatz-Stil „Honey“ (Modus: ergänzen)
+ * Warme Bienenfarben passend zum Little-RiskBee-Logo. Überschreibt nur
+ * Design-Variablen und wenige Details; Layout bleibt aus css/style.css.
+ * ===================================================================== */
+:root {
+  --bg: #fbf7ee;
+  --surface: #fffdf8;
+  --surface-2: #f6eedb;
+  --border: #e6d8b8;
+  --text: #2a2213;
+  --text-muted: #6d5f45;
+  --primary: #c98a00;
+  --primary-contrast: #1b1405;
+  --info: #0e7c86;
+  --radius: 14px;
+}
+html[data-theme="dark"] {
+  --bg: #15120b;
+  --surface: #1f1a10;
+  --surface-2: #2a2416;
+  --border: #423823;
+  --text: #f4ead2;
+  --text-muted: #c2b28d;
+  --primary: #f4b400;
+  --primary-contrast: #1b1405;
+}
+@media (prefers-color-scheme: dark) {
+  html[data-theme="auto"] {
+    --bg: #15120b; --surface: #1f1a10; --surface-2: #2a2416; --border: #423823;
+    --text: #f4ead2; --text-muted: #c2b28d; --primary: #f4b400; --primary-contrast: #1b1405;
+  }
+}
+.topbar { background: linear-gradient(90deg, #1f1a10, #3a2c0b); color: #f4ead2; border-bottom: 3px solid #f4b400; }
+.topbar .brand-sub { color: #e8d39a; }
+.topbar .btn, .topbar .icon-btn { background: rgba(255,255,255,.08); color: #f4ead2; border-color: rgba(255,255,255,.2); }
+.card { border-top: 3px solid var(--primary); }
+.sidebar a.active { box-shadow: inset 4px 0 0 #2a2213; }

@@ -57,6 +57,12 @@ HA.Report = (function () {
 
   function badge(cls, text) { return '<span class="badge ' + cls + '">' + esc(text) + '</span>'; }
 
+  /** Bibliotheken, aus denen die anwendbaren Maßnahmen stammen (gewählte zuerst). */
+  function libsOf(asset, items) {
+    var out = (asset.libs || []).filter(function (l) { return items.some(function (it) { return it.lib === l; }); });
+    items.forEach(function (it) { if (out.indexOf(it.lib) < 0) out.push(it.lib); });
+    return out;
+  }
   /** Abschnitt für ein Asset. */
   function assetSection(state, asset, opts, first) {
     var A = HA.App;
@@ -69,11 +75,16 @@ HA.Report = (function () {
 
     /* 1. Stammdaten */
     h.push('<h3>1. ' + esc(HA.lang === 'de' ? 'Stammdaten' : 'Asset data') + '</h3><table class="kv"><tbody>');
-    [['c.hostname', asset.hostname], ['c.ip', asset.ip], ['c.os', HA.tx(os) + (asset.osVersion ? ' – ' + asset.osVersion : '')],
-     ['c.role', t('c.' + (asset.role || os.role))], ['c.owner', asset.owner], ['c.location', asset.location], ['c.description', asset.description],
+    var sys = (asset.kind || 'system') === 'system', de = HA.lang !== 'en';
+    var libsUsed = libsOf(asset, items);
+    [[de ? 'Zielobjekt-Typ' : 'Target object type', A.kindLabel(asset)],
+     ['c.hostname', asset.hostname], sys ? ['c.ip', asset.ip] : [de ? 'Details' : 'Details', [asset.ip, asset.osVersion].filter(Boolean).join(' · ')],
+     sys ? ['c.os', HA.tx(os) + (asset.osVersion ? ' – ' + asset.osVersion : '')] : null,
+     sys ? ['c.role', t('c.' + (asset.role || os.role))] : null, ['c.owner', asset.owner], ['c.location', asset.location], ['c.description', asset.description],
      ['c.approach', t('approach.' + (asset.approach || 'standard'))],
-     ['c.libraries', (asset.libs || []).map(function (l) { var lib = A.getLib(l); return HA.tx(lib.name) + (lib.version ? ' (' + lib.version + ')' : ''); }).join('; ')]
-    ].forEach(function (r) { h.push('<tr><td>' + esc(t(r[0])) + '</td><td>' + esc(r[1] || '–') + '</td></tr>'); });
+     [de ? 'Modellierte Bausteine' : 'Modelled modules', (asset.modules || []).map(function (m) { return m + ' ' + HA.GS.title(m); }).join('; ')],
+     ['c.libraries', libsUsed.map(function (l) { var lib = A.getLib(l); return HA.tx(lib.name) + (lib.version ? ' (' + lib.version + ')' : ''); }).join('; ')]
+    ].filter(Boolean).forEach(function (r) { h.push('<tr><td>' + esc(t(r[0])) + '</td><td>' + esc(r[1] || '–') + '</td></tr>'); });
     h.push('</tbody></table>');
 
     /* 2. Schutzbedarf */
@@ -91,7 +102,7 @@ HA.Report = (function () {
     var tot = Math.max(1, stats.total);
     h.push('<div class="bar">' + ['done', 'partial', 'notdone', 'na'].map(function (s) { return '<span class="b-' + s + '" style="width:' + (stats[s] / tot * 100) + '%"></span>'; }).join('') + '</div>');
     h.push('<table><thead><tr><th>' + esc(t('c.library')) + '</th>' + HA.STATUS.map(function (s) { return '<th>' + esc(t('status.' + s)) + '</th>'; }).join('') + '<th>' + esc(t('c.total')) + '</th></tr></thead><tbody>');
-    (asset.libs || []).forEach(function (l) {
+    libsUsed.forEach(function (l) {
       var li = items.filter(function (it) { return it.lib === l; });
       if (!li.length) return;
       var c = { open: 0, done: 0, partial: 0, notdone: 0, na: 0 };
@@ -102,7 +113,7 @@ HA.Report = (function () {
 
     /* 4. Maßnahmen */
     h.push('<h3>4. ' + esc(HA.lang === 'de' ? 'Maßnahmen und Wirksamkeitskontrolle' : 'Measures and effectiveness review') + '</h3>');
-    (asset.libs || []).forEach(function (l) {
+    libsUsed.forEach(function (l) {
       var li = items.filter(function (it) { return it.lib === l && (opts.includeOpen || (A.getCheck(asset, it).status || 'open') !== 'open'); });
       if (!li.length) return;
       h.push('<p><b>' + esc(HA.tx(A.getLib(l).name)) + '</b></p>');
@@ -306,7 +317,7 @@ HA.Report = (function () {
     // Deckblatt mit Logo und Absenderangaben
     var org = [state.meta.org ? '<b style="font-size:12pt">' + esc(state.meta.org) + '</b>' : '', B.subtitle, B.address, B.contact, B.web].filter(Boolean)
       .map(function (x, i) { return i === 0 && state.meta.org ? x : esc(x).replace(/\n/g, '<br>'); }).join('<br>');
-    h.push('<div class="cover">' + (B.logo || org ? '<div class="brandbar">' + (B.logo ? '<img src="' + esc(B.logo) + '" alt="Logo">' : '<span></span>') + '<div class="org">' + org + '</div></div>' : '') +
+    h.push('<div class="cover"><div class="brandbar"><img src="' + esc(B.logo || HA.DEFAULT_LOGO) + '" alt="Logo"><div class="org">' + org + '</div></div>' +
       '<h1>' + esc(title) + '</h1>');
     h.push('<table class="kv" style="margin-top:4mm"><tbody>' +
       '<tr><td>' + esc(HA.lang === 'de' ? 'Gegenstand' : 'Scope') + '</td><td>' + esc(assets.map(function (a) { return a.name; }).join(', ') || '–') + '</td></tr>' +
@@ -327,11 +338,17 @@ HA.Report = (function () {
     if (opts.includePm) h.push(pmSection(state));
     if (opts.includeSwot) h.push(swotSection(state));
     if (opts.includeRoadmap) h.push(roadmapSection(state, scope));
+    // Abschnitte aus Modulen (Risikoregister, Monte-Carlo, KPI, Pflichtenkalender, BCM …)
+    EXT.forEach(function (x) { if (!opts.ext || opts.ext[x.key]) { try { h.push(x.build(state, scope, H)); } catch (e) { h.push('<p class="muted">[' + esc(x.key) + ': ' + esc(e.message) + ']</p>'); } } });
     h.push('<h2>' + esc(HA.lang === 'de' ? 'Freigabe' : 'Approval') + '</h2><div class="sign"><div>' + esc(HA.lang === 'de' ? 'Erstellt (Datum, Unterschrift)' : 'Prepared (date, signature)') +
       '</div><div>' + esc(HA.lang === 'de' ? 'Geprüft – ISB (Datum, Unterschrift)' : 'Reviewed – ISO (date, signature)') + '</div><div>' + esc(HA.lang === 'de' ? 'Freigegeben – Leitung (Datum, Unterschrift)' : 'Approved – management (date, signature)') + '</div></div>');
+    h.push('<p class="muted small" style="margin-top:10mm;text-align:center">' + esc(t('rep.madeWith')) + '</p>');
     h.push('</div></body></html>');
     return h.join('\n');
   }
 
-  return { build: build, esc: esc };
+  /* Erweiterungen: { key, build(state, scope, helpers) → HTML } */
+  var EXT = [];
+  var H = { esc: esc, fmtDate: fmtDate, badge: badge, t: t };
+  return { build: build, esc: esc, fmtDate: fmtDate, ext: EXT, css: function () { return CSS; } };
 })();

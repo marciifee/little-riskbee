@@ -156,8 +156,14 @@ HA.LIBRARIES = [
     license: '—', url: '', reference: null
   }
 ];
+/* Interne Pseudo-Bibliothek: Baustein-Check für modellierte Bausteine ohne Einzelanforderungen */
+HA.LIB_EXTRA = [
+  { id: 'gsmod', short: 'GS-Baustein', color: '#0f766e', builtin: false,
+    name: { de: 'IT-Grundschutz-Baustein (Gesamtbewertung)', en: 'IT-Grundschutz module (overall assessment)' },
+    desc: { de: 'Wird automatisch für modellierte Bausteine angezeigt, zu denen keine Einzelanforderungen vorliegen. Einzelanforderungen über den Import des Kompendiums (XML) oder als eigene Anforderungen ergänzen.', en: 'Shown automatically for modelled modules without individual requirements. Add requirements by importing the compendium (XML) or as custom requirements.' } }
+];
 HA.libById = function (id) {
-  return HA.LIBRARIES.find(function (l) { return l.id === id; }) ||
+  return HA.LIBRARIES.find(function (l) { return l.id === id; }) || HA.LIB_EXTRA.find(function (l) { return l.id === id; }) ||
     { id: id, short: id, color: '#64748b', name: { de: id, en: id }, desc: { de: '', en: '' } };
 };
 

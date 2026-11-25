@@ -38,8 +38,8 @@ HA.Risk = (function () {
   ];
   function category(p, i) { return MATRIX[(i || 1) - 1][(p || 1) - 1]; }
 
-  /** Elementare Gefährdungen (Auswahl aus dem IT-Grundschutz-Kompendium) als Vorschlagsliste. */
-  var THREATS = [
+  /** Alle 47 elementaren Gefährdungen (aus data/gs-glossary.js) als Vorschlagsliste; Fallback: Auswahl. */
+  var THREATS = HA.GS ? HA.GS.THREATS.map(function (x) { return x.id + ' ' + x.de; }) : [
     'G 0.14 Ausspähen von Informationen (Spionage)', 'G 0.15 Abhören', 'G 0.16 Diebstahl von Geräten, Datenträgern oder Dokumenten',
     'G 0.17 Verlust von Geräten, Datenträgern oder Dokumenten', 'G 0.18 Fehlplanung oder fehlende Anpassung', 'G 0.19 Offenlegung schützenswerter Informationen',
     'G 0.20 Informationen oder Produkte aus unzuverlässiger Quelle', 'G 0.21 Manipulation von Hard- oder Software', 'G 0.22 Manipulation von Informationen',
@@ -234,6 +234,8 @@ HA.Risk = (function () {
   function prioFromCat(cat) { return { veryhigh: 'p1', high: 'p2', medium: 'p3', low: 'p4' }[cat] || 'p4'; }
 
   /** Offene Punkte aus Befunden, Checkliste und Projektrisiken priorisieren. */
+  /* Erweiterbar: Module hängen hier eigene Roadmap-Quellen bzw. Rückschreib-Funktionen ein. */
+  var roadmapSources = [], roadmapWriters = {}, roadmapKinds = [];
   function roadmap(state, opts) {
     opts = opts || {};
     var A = HA.App, list = [];
@@ -268,6 +270,8 @@ HA.Risk = (function () {
         detail: t('pm.cat.' + (pr.category || 'technology')), action: pr.measures || '', owner: pr.owner || '', due: pr.due || '', status: t('pm.st.' + (pr.status || 'open')),
         set: { type: 'project', id: pr.id } });
     });
+    // d) weitere Quellen aus Modulen (Risikoregister, BCM-Übungen …)
+    roadmapSources.forEach(function (fn) { (fn(state, opts, { prioFromCat: prioFromCat, pmCategory: pmCategory, category: category }) || []).forEach(function (x) { list.push(x); }); });
     var today = new Date().toISOString().slice(0, 10);
     list.forEach(function (x) { x.overdue = !!(x.due && x.due < today); });
     var order = { p1: 0, p2: 1, p3: 2, p4: 3 };
@@ -360,6 +364,7 @@ HA.Risk = (function () {
     CATS: CATS, CH_COLORS: CH_COLORS, CH_TEXT: CH_TEXT, CH_STRATEGIES: CH_STRATEGIES, CH_STATUS: CH_STATUS, exampleChances: exampleChances, swotDerive: swotDerive, COLORS: COLORS, TEXT: TEXT, THREATS: THREATS, PHASES: PHASES, PM_STATUS: PM_STATUS, PM_CATEGORIES: PM_CATEGORIES, TOM: TOM,
     category: category, findingRows: findingRows, ensureIds: ensureIds, latestScans: latestScans, suggest: suggest, heatmapHtml: heatmapHtml,
     legendHtml: legendHtml, badge: badge, pmCategory: pmCategory, pmCatCell: pmCatCell, exampleProjectRisks: exampleProjectRisks,
-    roadmap: roadmap, roadmapCsv: roadmapCsv, tomSummary: tomSummary, protection: protection
+    roadmap: roadmap, roadmapCsv: roadmapCsv, tomSummary: tomSummary, protection: protection,
+    roadmapSources: roadmapSources, roadmapWriters: roadmapWriters, roadmapKinds: roadmapKinds, prioFromCat: prioFromCat, MATRIX: MATRIX
   };
 })();

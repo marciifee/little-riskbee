@@ -1,0 +1,21 @@
+/* =====================================================================
+ * themes/contrast.css – Zusatz-Stil „Hoher Kontrast“ (Modus: ergänzen)
+ * Für Barrierefreiheit: stärkere Kontraste, dickere Rahmen, deutliche
+ * Fokusmarkierung, etwas größere Schrift.
+ * ===================================================================== */
+:root {
+  --bg: #ffffff; --surface: #ffffff; --surface-2: #f0f0f0; --border: #000000;
+  --text: #000000; --text-muted: #222222; --primary: #0033aa; --primary-contrast: #ffffff;
+  --ok: #006400; --warn: #8a4b00; --danger: #b00000; --shadow: none;
+}
+html[data-theme="dark"], html[data-theme="auto"] {
+  --bg: #000000; --surface: #000000; --surface-2: #1a1a1a; --border: #ffffff;
+  --text: #ffffff; --text-muted: #e0e0e0; --primary: #ffd400; --primary-contrast: #000000;
+  --ok: #4cff4c; --warn: #ffb000; --danger: #ff5c5c;
+}
+@media (prefers-color-scheme: light) { html[data-theme="auto"] { --bg: #ffffff; --surface: #ffffff; --surface-2: #f0f0f0; --border: #000000; --text: #000000; --text-muted: #222222; --primary: #0033aa; --primary-contrast: #ffffff; --ok: #006400; --warn: #8a4b00; --danger: #b00000; } }
+html { font-size: 17px; }
+.card, input, select, textarea, .btn, table, th, td { border-width: 2px !important; }
+a { text-decoration: underline; }
+:focus-visible { outline: 3px solid var(--primary) !important; outline-offset: 2px !important; }
+.muted, .small.muted { color: var(--text-muted) !important; }

@@ -14,10 +14,10 @@ HA.GUIDES = [
   /* ================================================================ */
   {
     id: 'method', os: ['*'],
-    title: { de: 'Vorgehen: Härtung mit Wirksamkeitsnachweis', en: 'Method: hardening with proof of effectiveness' },
+    title: { de: 'Vorgehen nach PDCA: Härtung mit Wirksamkeitsnachweis', en: 'PDCA method: hardening with proof of effectiveness' },
     intro: {
-      de: 'Empfohlener Ablauf angelehnt an BSI-Standard 200-2 bzw. Grundschutz++ (BSI-Standard 300-1): erst erfassen und bewerten, dann messen, härten, erneut messen und dokumentieren.',
-      en: 'Recommended workflow based on BSI Standard 200-2 / Grundschutz++ (BSI Standard 300-1): capture and assess first, then measure, harden, measure again and document.'
+      de: 'Empfohlener Ablauf nach dem PDCA-Zyklus, angelehnt an BSI-Standard 200-2 bzw. Grundschutz++ (BSI-Standard 300-1). Plan: Schritte 1–3 · Do: Schritte 4–5 · Check: Schritte 6–7 · Act: Schritt 8 – danach beginnt der nächste Zyklus mit den offenen Punkten der Roadmap.',
+      en: 'Recommended workflow following the PDCA cycle, based on BSI Standard 200-2 / Grundschutz++ (BSI Standard 300-1). Plan: steps 1–3 · Do: 4–5 · Check: 6–7 · Act: 8 – then the next cycle starts with the open roadmap items.'
     },
     steps: [
       { t: { de: '1. Asset erfassen', en: '1. Register the asset' },
