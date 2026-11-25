@@ -211,13 +211,6 @@ Lade danach die Seite im Browser neu. Da `nginx:stable-alpine` ein dynamischer T
 | **CIS, DISA STIG, ANSSI BP-028** | **Per Import (XCCDF bzw. SSG-Profile)** | CIS ist für kommerzielle Nutzung lizenzpflichtig, daher nicht eingebaut. |
 | **Eigene Maßnahmen** | **Direkt in der Checkliste anlegbar** | Zum Beispiel auf Basis von Lynis-Empfehlungen oder über den CSV-Katalogimport. |
 
-## Datenschutz
-
-- Verarbeitung ausschließlich lokal im Browser. Im Docker-Betrieb liefert Apache die Anwendungsdateien aus. Importierte Befunde und Projektstände bleiben im Browser. Die Anwendung verwendet keine Cookies, Tracker, CDNs oder Webfonts.
-- Eine Content-Security-Policy (`connect-src 'none'`) blockiert von der Anwendung initiierte Verbindungen über APIs wie Fetch, XMLHttpRequest oder WebSocket.
-- Speicherung in IndexedDB/localStorage des Browsers und in selbst exportierten JSON-Dateien; Löschen über *Einstellungen → Alle lokalen Daten löschen*.
-- Exporte und Berichte enthalten sicherheitskritische Informationen → vertraulich behandeln.
-
 ## Import und Beispieldateien
 
 Über **Import** Dateien auswählen oder hineinziehen. Bei Bedarf das Format ausdrücklich wählen. Die Dateiendung allein genügt nicht: XML, JSON und CSV müssen dem jeweils unterstützten Bericht- oder Katalogformat entsprechen. Eine vollständige Projektsicherung wird über **Laden** wiederhergestellt.
@@ -256,13 +249,20 @@ Im Ordner [samples/](samples/) liegen fiktive Beispieldateien bereit, mit denen 
 
 ### Fachliche Einordnung
 
-- Kataloge und Vorlagen unterstützen die Bearbeitung; sie ersetzen keine vollständigen Originalquellen oder eine unabhängige Prüfung. Ein erstellter Bericht ist keine Zertifizierung.
-- Die eingebauten BSI-Anforderungen beziehen sich auf **Edition 2023**. Die Übersicht über 111 Bausteine bedeutet nicht, dass sämtliche Einzelanforderungen aller Bausteine eingebaut sind.
-- Risikobewertung und eigene Registerrisiken nutzen eine 4×4-Matrix; Projektrisiken eine 5×5-Matrix. Monte-Carlo-Ergebnisse hängen von den gewählten Annahmen und Schätzungen ab.
-- Beim Vergleich neuer Scans können nicht mehr gefundene Befunde als behoben markiert werden. Vor einer fachlichen Freigabe prüfen, ob Scan-Umfang und Qualität vergleichbar sind.
-- Pflichtintervalle, BIA-Schwellen und Simulationskalibrierungen sind Vorschläge und müssen zum eigenen Einsatz passen.
-- Erinnerungen aus der Anwendung benötigen eine geöffnete Seite und für Benachrichtigungen gegebenenfalls Browserberechtigungen. Für Termine bei geschlossener Seite ICS exportieren und in einen Kalender importieren. Nach Änderungen neu exportieren; wie bestehende Termine aktualisiert werden, hängt vom Kalenderprogramm ab.
+- Integrierte Kataloge und Vorlagen unterstützen die praktische Arbeit, ersetzen jedoch weder vollständige Originalnormen noch eine unabhängige Prüfung. Ein erzeugter Bericht stellt keine offizielle Zertifizierung dar.
+- Die enthaltenen BSI-Anforderungen basieren auf der **Edition 2023**. Die Übersicht über alle 111 Bausteine bedeutet nicht, dass sämtliche Einzelanforderungen jedes Bausteins vorinstalliert sind.
+- Die Risikobewertung von Befunden und eigene Registerrisiken nutzen eine `4×4-Matrix`; Projektrisiken eine  `5×5-Matrix`. Ergebnisse der Monte-Carlo-Simulation hängen maßgeblich von den hinterlegten Schätzungen ab.
+- Beim Import neuer Scans werden nicht mehr gefundene Befunde automatisch als behoben markiert. Prüfe vor einer fachlichen Freigabe immer, ob Scan-Umfang und -Tiefe mit dem vorherigen Lauf vergleichbar sind.
+- Hinterlegte Pflichtintervalle, BIA-Schwellenwerte und Simulationskalibrierungen dienen als Orientierung und müssen an deine Organisation angepasst werden.
+- Erinnerungen innerhalb der Anwendung setzen einen geöffneten Tab sowie ggf. erteilte Browser-Benachrichtigungsrechte voraus. Für zuverlässige Erinnerungen bei geschlossenem Browser exportiere die Termine als ICS-Datei in deinen Kalender (Hinweis: Nach Änderungen im Pflichtenkalender ist ein erneuter ICS-Export nötig; wie bestehende Termine aktualisiert werden, hängt vom jeweiligen Kalenderprogramm ab).
 
+## Datenschutz
+
+- **100 % lokale Verarbeitung**: Sämtliche Daten bleiben in deinem Browser. Im Docker-Betrieb liefert Nginx lediglich die statischen Anwendungsdateien aus. Es kommen keinerlei Cookies, Tracker, externe CDNs oder Webfonts zum Einsatz.
+- **Strikte Content-Security-Policy**: Eine hinterlegte CSP (`connect-src 'none'`) unterbindet jegliche ausgehenden Netzwerkverbindungen der Anwendung über APIs wie `fetch`, `XMLHttpRequest` oder `WebSocket`.
+- **Datenhaltung**: Daten liegen ausschließlich in `IndexedDB`/`localStorage` deines Browsers sowie in deinen manuell exportierten JSON-Dateien.
+- **Vertraulichkeit**: Exportierte Sicherungen und Berichte enthalten sicherheitskritische Informationen zu deiner Infrastruktur und sollten entsprechend vertraulich behandelt werden.
+  
 ## Ordnerstruktur
 
 ```
@@ -271,7 +271,7 @@ README.en.md            English documentation
 Dockerfile              Nginx-Image mit statischen Anwendungsdateien
 docker-compose.yaml     Lokaler Docker-Betrieb auf Port 8080
 .dockerignore           Beschränkt den Build-Kontext auf Anwendungsdateien
-index.html              Einstieg
+index.html              Hauptdatei
 assets/                 Logo (little-riskbee.svg, PNG 512) und Favicons (SVG, ICO, PNG, Apple-Touch-Icon)
 js/data/logo.js         Standardlogo als Data-URI (Kopfzeile und Bericht, solange kein eigenes Logo hochgeladen ist)
 css/style.css           Layout, Hell/Dunkel, Responsive, Druck
