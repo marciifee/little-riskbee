@@ -1,0 +1,10 @@
+**
+!Dockerfile
+!index.html
+!assets/
+!assets/**
+!css/
+!css/**
+!js/
+!js/**
+**/.DS_Store
