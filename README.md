@@ -5,32 +5,31 @@
 
 **Deutsch** | [English](README.en.md)
 
-Little-RiskBee unterstützt Sie dabei, Windows-, Linux- und macOS-Systeme sowie organisatorische Zielobjekte zu erfassen, Sicherheitsmaßnahmen zu planen, Scan-Ergebnisse auszuwerten und Risiken nachvollziehbar zu dokumentieren. \
-Die Oberfläche folgt dem **PDCA-Zyklus: Plan → Do → Check → Act**. \
-Ergänzend stehen Werkzeuge für Business Continuity und Pentest-Berichte bereit.
+**Little RiskBee** unterstützt dich dabei, Windows-, Linux- und macOS-Systeme sowie organisatorische Zielobjekte zu erfassen, Sicherheitsmaßnahmen zu planen, Scan-Ergebnisse auszuwerten und Risiken revisionssicher zu dokumentieren.  
+Die Oberfläche folgt dem **PDCA-Zyklus (Plan → Do → Check → Act)** und bietet ergänzende Werkzeuge für Business Continuity Management (BCM) und Pentest-Berichte.
 
-Die Anwendung besteht aus HTML, CSS und JavaScript. Sie benötigt weder npm noch einen Compiler, eine Datenbankinstallation oder einen Anwendungsserver. Sie lässt sich direkt als Datei öffnen oder über den mitgelieferten Docker-Container bereitstellen. Die Oberfläche kann zwischen Deutsch und Englisch umgeschaltet werden; eigene und importierte Inhalte werden nicht automatisch übersetzt.
+Die Anwendung basiert rein auf HTML, CSS und JavaScript – ganz ohne npm, Build-Prozess, Datenbankinstallation oder Anwendungsserver. Du kannst sie direkt als lokale Datei im Browser öffnen oder über den mitgelieferten Docker-Container bereitstellen. Die Oberfläche lässt sich jederzeit zwischen Deutsch und Englisch umschalten (eigene und importierte Inhalte bleiben dabei unverändert).
 
-> **Wichtig zur Speicherung:** Arbeitsdaten liegen im jeweiligen Browserprofil. Auch bei Docker-Betrieb werden sie nicht im Container gespeichert und nicht zwischen Personen oder Geräten synchronisiert. Regelmäßige JSON-Sicherungen sind deshalb Teil des Arbeitsablaufs.
+> **Wichtiger Hinweis zur Datenspeicherung:** Alle Arbeitsdaten werden ausschließlich im jeweiligen Browserprofil gespeichert. Auch beim Betrieb über Docker verbleiben keine Daten im Container und es findet keine Synchronisation zwischen Personen oder Geräten statt. Regelmäßige JSON-Sicherungen sind daher ein fester Bestandteil des Arbeitsablaufs.
 
 ## Für wen ist Little RiskBee gedacht?
 
 | Nutzerprofil | Typischer Einsatz |
-| --- | --- |
-| **IT-Admins mit Security-Schwerpunkt** | Server und Clients anhand von Härtungschecklisten prüfen und die Umsetzung dokumentieren. |
-| **Informationssicherheitsbeauftragte (ISB)** | Risiken priorisieren, Restrisiken nachvollziehen und die Wirksamkeit von Maßnahmen prüfen. |
-| **Compliance-Manager** | Kataloganforderungen und interne Vorgaben zusammenführen und Nachweise für Audits vorbereiten. |
-| **Interne Auditoren** | Umsetzungsstand, Abweichungen und Wirksamkeitsnachweise je System nachvollziehen. |
-| **Pentester** | Befunde aus abgeschlossenen Prüfungen übergeben und deren Behebung nachverfolgen. |
-| **IT Security Coordinators** | Maßnahmen koordinieren und Zuständigkeiten, Fristen und Fortschritt im Blick behalten. |
+| :--- | :--- |
+| **IT-Admins mit Security-Schwerpunkt** | Server und Clients anhand von Härtungschecklisten prüfen und die Umsetzung lückenlos dokumentieren. |
+| **Informationssicherheitsbeauftragte (ISB)** | Risiken priorisieren, Restrisiken nachvollziehen und die Wirksamkeit getroffener Maßnahmen überwachen. |
+| **Compliance-Manager** | Kataloganforderungen und interne Vorgaben zusammenführen sowie belastbare Nachweise für Audits vorbereiten. |
+| **Interne Auditoren** | Umsetzungsstände, Abweichungen und Wirksamkeitsnachweise je System nachvollziehen. |
+| **Pentester** | Befunde aus abgeschlossenen Sicherheitsprüfungen strukturiert übergeben und deren Behebung verfolgen. |
+| **IT Security Coordinators** | Maßnahmen teamübergreifend koordinieren sowie Zuständigkeiten, Fristen und Fortschritte im Blick behalten. |
 
 ## Was Little RiskBee nicht ist
 
-- **Kein Vulnerability Scanner.** Die Scans laufen in externen Werkzeugen. Berichte in unterstützten Formaten lassen sich importieren, um Befunde zu bewerten und ihre Behebung nachzuverfolgen.
-- **Kein SIEM.** Little RiskBee dient der Bearbeitung dokumentierter Befunde. Die zentrale Erfassung und Korrelation von Sicherheitsereignissen erfolgt in spezialisierten Systemen.
-- **Kein Echtzeitmonitoring.** Der Stand ergibt sich aus erfassten Befunden, importierten Berichten und dokumentierten Prüfungen.
-- **Kein Dokumentenmanagementsystem.** Berichte und Nachweise lassen sich exportieren. Die zentrale Ablage, Freigabe und Versionierung erfolgen außerhalb der Anwendung.
-- **Kein Fertigprodukt.** Little RiskBee ist ein erweiterbares Werkzeug, das du mit eigenen Maßnahmen und Katalogen an deine Umgebung anpasst.
+- **Kein Vulnerability Scanner:** Schwachstellenscans laufen weiterhin in deinen gewohnten externen Werkzeugen. Little RiskBee importiert deren Berichte, um Befunde zu bewerten und die Behebung nachzuverfolgen.
+- **Kein SIEM:** Die Anwendung dient der Bearbeitung dokumentierter Befunde – nicht der zentralen Echtzeit-Erfassung und Korrelation von Log- und Sicherheitsereignissen.
+- **Kein Echtzeit-Monitoring:** Der abgebildete Sicherheitsstatus basiert stets auf deinen erfassten Befunden, importierten Berichten und dokumentierten Prüfungen.
+- **Kein Dokumentenmanagementsystem (DMS):** Berichte und Nachweise lassen sich zwar exportieren, die zentrale Ablage, Freigabe und Versionierung erfolgen jedoch außerhalb der Anwendung.
+- **Kein starres Fertigprodukt:** Little RiskBee ist ein modular erweiterbares Werkzeug, das du mit eigenen Maßnahmen, Katalogen und Stilen flexibel an deine Umgebung anpassen kannst.
 
 ## Inhalt
 
@@ -50,24 +49,25 @@ Die Anwendung besteht aus HTML, CSS und JavaScript. Sie benötigt weder npm noch
 
 ### Direkt im Browser
 
-1. Repository klonen oder auf GitHub als ZIP herunterladen und vollständig entpacken.
-2. `index.html` in einem aktuellen Browser öffnen, z. B. Chrome, Edge, Firefox oder Safari.
-3. Unter **Einstellungen** die Projektdaten und anschließend unter **Assets** die Zielobjekte anlegen.
+1. Repository klonen oder auf GitHub als ZIP-Archiv herunterladen und vollständig entpacken.
+2. Die Datei `index.html` in einem aktuellen Browser öffnen (z. B. Chrome, Edge, Firefox oder Safari).
+3. Unter **Einstellungen** die Projektdaten und anschließend unter **Assets** die ersten Zielobjekte anlegen.
 4. Über **Speichern** eine erste JSON-Sicherung herunterladen.
 
-Alle Unterordner müssen zusammen mit `index.html` erhalten bleiben. Nach dem Herunterladen ist für diesen Startmodus keine Internetverbindung erforderlich. Browser können die dauerhafte Speicherung unter `file://` einschränken; in diesem Fall Docker oder einen lokalen HTTP-Server verwenden und den bisherigen Stand zuvor exportieren.
+Alle Unterordner müssen gemeinsam mit `index.html` erhalten bleiben. Nach dem Herunterladen ist keine Internetverbindung mehr erforderlich.
 
+> **Hinweis zu `file://`:** Einige Browser schränken die dauerhafte lokale Speicherung (`IndexedDB`/`localStorage`) ein, wenn Dateien direkt über `file://` geöffnet werden. Nutze in diesem Fall Docker oder einen lokalen Webserver und exportiere deinen bisherigen Stand vor dem Wechsel als JSON-Datei.
 
 ## Docker und Docker Compose
 
 ### Voraussetzungen
 
-- Git zum Klonen des Repositorys.
-- Docker mit laufender Engine und dem Compose-Plugin (`docker compose`), beispielsweise über Docker Desktop.
-- Freier lokaler Port `8080`.
-- Internetzugang für das Klonen und den ersten Download des Nginx-Basisimages.
+- Git zum Klonen des Repositorys
+- Docker mit laufender Engine und Compose-Plugin (`docker compose`), z. B. über Docker Desktop
+- Freier lokaler Port `8080`
+- Internetzugang für das Klonen und den einmaligen Download des Nginx-Basisimages
 
-Prüfen:
+Installation prüfen:
 
 ```bash
 git --version
@@ -84,9 +84,9 @@ docker compose -f docker-compose.yaml config
 docker compose -f docker-compose.yaml up -d --build
 ```
 
-Anschließend [http://localhost:8080](http://localhost:8080) öffnen.
+Anschließend die Anwendung im Browser unter http://localhost:8080 öffnen.
 
-Die mitgelieferte [docker-compose.yaml](docker-compose.yaml) enthält:
+Die mitgelieferte docker-compose.yaml definiert folgenden Dienst:
 
 ```yaml
 services:
@@ -100,29 +100,29 @@ services:
     restart: unless-stopped
 ```
 
-Der [Dockerfile](Dockerfile) kopiert die Anwendung in das offizielle Nginx-Image. Dabei wird kein JavaScript kompiliert. Die Anwendung wird auf dem Container-Port `80` ausgeliefert; der Host stellt sie ausschließlich lokal auf Port `8080` bereit. Es sind keine `.env`-Datei und keine Docker-Volumes erforderlich. Die [Docker-Anleitung](https://docs.docker.com/compose/gettingstarted/) erläutert Compose; Details zum Basisimage stehen beim [offiziellen Nginx-Image](https://hub.docker.com/_/nginx).
+Das Dockerfile kopiert die statischen Dateien in das offizielle Nginx-Image (es findet kein JavaScript-Build statt). Die Anwendung läuft im Container auf Port 80 und wird auf dem Host ausschließlich lokal unter 127.0.0.1:8080 bereitgestellt. Es werden weder eine .env-Datei noch Docker-Volumes benötigt. Weitere Informationen bieten die [Docker-Anleitung](https://docs.docker.com/compose/gettingstarted/) sowie die Seite zum [offiziellen Nginx-Image](https://hub.docker.com/_/nginx).
 
 ### Betrieb, Protokolle und Stoppen mit Compose
 
 ```bash
-# Status anzeigen
+# Container-Status anzeigen
 docker compose -f docker-compose.yaml ps
 
-# Protokolle anzeigen; mit Strg+C verlassen
+# Live-Protokolle verfolgen (beenden mit Strg+C)
 docker compose -f docker-compose.yaml logs -f
 
 # Stoppen und Container entfernen
 docker compose -f docker-compose.yaml down
 
-# Erneut starten
+# Container erneut starten
 docker compose -f docker-compose.yaml up -d
 ```
 
-`down` entfernt keine Browserdaten. Ein Container-Backup sichert umgekehrt keine Arbeitsdaten; dafür **Speichern** in der Anwendung verwenden.
+`docker compose down` löscht keine Browserdaten. Umgekehrt sichert ein Backup des Docker-Containers keine Arbeitsdaten – nutze dafür immer die Funktion **Speichern** direkt in der Anwendung.
 
 ### Aktualisieren
 
-Zuerst den Arbeitsstand als JSON sichern. In einem Git-Klon mit unveränderten Projektdateien:
+Sichere vor jedem Update deinen aktuellen Arbeitsstand als JSON-Datei. In einem unveränderten Git-Klon aktualisierst du die Anwendung wie folgt:
 
 ```bash
 git pull --ff-only
@@ -130,53 +130,74 @@ docker compose -f docker-compose.yaml build --pull
 docker compose -f docker-compose.yaml up -d
 ```
 
-Anschließend die Seite neu laden. Änderungen am Quellcode benötigen einen erneuten Image-Build. Bei lokalen Anpassungen diese vor `git pull` sichern bzw. über Git zusammenführen. `nginx:stable-alpine` ist ein beweglicher Tag; `--pull` aktualisiert das Basisimage. 
+Lade danach die Seite im Browser neu. Da `nginx:stable-alpine` ein dynamischer Tag ist, aktualisiert `--pull` gleichzeitig das Basisimage. Falls du lokale Anpassungen am Quellcode vorgenommen hast, sichere diese vor `git pull` oder führe sie regulär über Git zusammen.
 
 ## Erster Arbeitsablauf
 
 1. **Projekt vorbereiten:** In den Einstellungen Stammdaten, Ansprechpersonen, Branding und Berichtstitel pflegen.
-2. **Plan – planen:** Assets anlegen oder importieren, Typ und Betriebssystem zuordnen, Bausteine modellieren und den Schutzbedarf für Vertraulichkeit, Integrität und Verfügbarkeit begründen. Bibliotheken und Vorgehensweise auswählen; Risiken und Risikoappetit erfassen.
-3. **Do – umsetzen:** Checkliste bearbeiten. Verantwortliche, Fristen, Nachweise und begründete Ausnahmen dokumentieren. Prüfbefehle auf dem jeweiligen Zielsystem selbst ausführen; die Anwendung führt keine Härtung oder Scans auf den Systemen aus.
-4. **Check – prüfen:** Extern erzeugte Scan-Berichte importieren, Zuordnungen kontrollieren und Befunde bewerten. Wirksamkeitskontrolle, Gap-Analyse und KPI-Dashboard nutzen.
-5. **Act – verbessern:** Roadmap priorisieren, Risikoentscheidungen und Reviews festhalten und Berichte exportieren.
-6. **BCM ergänzen:** Kritische Prozesse in der BIA untersuchen, Wiederanlaufziele festlegen, BC-Pläne und Krisenstab pflegen sowie Übungen dokumentieren.
-7. **Stand sichern:** JSON-Export herunterladen und regelmäßig eine Wiederherstellung in einem separaten Browserprofil prüfen.
+2. **Plan – Planen:** Assets anlegen oder importieren, Typ und Betriebssystem zuordnen, Bausteine modellieren und den Schutzbedarf (Vertraulichkeit, Integrität, Verfügbarkeit) begründen. Bibliotheken und Vorgehensweise wählen sowie Risiken und Risikoappetit festlegen.
+3. **Do – Umsetzen:** Checkliste abarbeiten sowie Verantwortliche, Fristen, Nachweise und begründete Ausnahmen dokumentieren. (Hinweis: Prüfbefehle führst du direkt auf dem jeweiligen Zielsystem aus – die Anwendung greift nicht aktiv auf Systeme zu.)
+4. **Check – Prüfen:** Extern erzeugte Scan-Berichte importieren, Zuordnungen kontrollieren und Befunde bewerten. Wirksamkeitskontrolle, Gap-Analyse und KPI-Dashboard zur Auswertung nutzen.
+5. **Act – Verbessern:** Roadmap priorisieren, Risikoentscheidungen und Reviews festhalten und Berichte exportieren.
+6. **BCM ergänzen:** Kritische Prozesse in der Business-Impact-Analyse (BIA) untersuchen, Wiederanlaufziele festlegen, BC-Pläne und Krisenstab pflegen sowie Übungen dokumentieren.
+7. **Stand sichern:** JSON-Export herunterladen.
 
 ## Funktionen
+Härtung, Kataloge & Audits
 
-| Bereich | Was die Seite macht |
+| Bereich | Funktionsumfang |
 |---|---|
-| **Assets / Geltungsbereiche** | Zielobjekte aller Schichten erfassen und nach Typ gruppiert anzeigen: 🏢 Informationsverbund & Prozesse (ISMS, ORP, CON, OPS, DER), 🧩 Anwendungen (APP), 🖥 IT-Systeme (SYS – Hostname, IP, OS, Rolle), 🏭 Industrielle IT (IND), 🌐 Netze (NET), 🏛 Infrastruktur (INF). **Modellierung**: je Zielobjekt die passenden der 111 IT-Grundschutz-Bausteine wählen (Vorschlag je Typ bzw. Betriebssystem). Liegen zu einem Baustein Einzelanforderungen vor (eingebaut, Kompendium-Import oder eigene), erscheinen diese; sonst eine Baustein-Gesamtbewertung. Bibliotheken (SSG, Baselines …) und Vorgehensweise (Basis / Standard / Kern) wie bisher; vorhandene Assets bleiben unverändert IT-Systeme. Import als CSV möglich. |
-| **Schutzbedarf** | Vertraulichkeit, Integrität, Verfügbarkeit je Asset: normal / hoch / sehr hoch mit Begründung (BSI-Standard 200-2, Maximumprinzip). Steuert, ob H-Anforderungen erscheinen. |
-| **Checkliste** | Maßnahmen interaktiv abarbeiten: Status (offen, umgesetzt, teilweise, nicht umgesetzt/Risiko, entbehrlich/gestrichen), Pflicht-Begründung beim Streichen, Notiz, Nachweis, Zuständigkeit, Termin, Prüfbefehle zum Kopieren, **Wirksamkeitskontrolle** (Ergebnis, Datum, Methode, Prüfer). Filter, Gruppierung, Massen-Streichung mit Begründung, eigene Maßnahmen. |
-| **Bibliotheken** | Vergleich: Anzahl Maßnahmen je Bibliothek und Betriebssystem, Aufteilung B/S/H, abgedeckte Themen, Abdeckungsmatrix (18 Themen), Referenzzahlen der Originalquellen, Einordnung. |
-| **Scans & Schwachstellen** | Je Asset alle importierten Scans mit Scan-Zeitpunkt aus dem Bericht, Importzeit, Dateiname und **SHA-256-Prüfsumme** als Nachweis. Je Befund: offen / teilweise behoben / behoben / Risiko akzeptiert / Fehlalarm + Begründung. Nicht mehr gefundene Befunde werden beim nächsten Scan automatisch als „behoben“ markiert; akzeptierte Risiken werden übernommen. |
-| **Risikobewertung** | Alle offenen, teilweise behobenen und akzeptierten Befunde der aktuellsten Scans mit Risiko-ID (R-001 …), Zielobjekt, Bedrohung (Vorschläge aus den elementaren Gefährdungen G 0.x), Eintrittshäufigkeit × Schadenshöhe (4 × 4, in Anlehnung an BSI-Standard 200-3), Heatmap grün → gelb → orange → rot, Behandlung (vermeiden / reduzieren / übertragen / akzeptieren), Maßnahme, Risikoeigner, Termin. Der Status ist derselbe wie unter „Scans“ (beidseitig synchron). Unbewertete Befunde erhalten einen Vorschlag aus Schwere und Schutzbedarf. |
-| **Projektrisiken, Chancen & SWOT** | Reiter „Chancen“ (Wahrscheinlichkeit × Nutzen, Strategien ausnutzen/verbessern/teilen/akzeptieren, eigene Matrix) und „SWOT-Analyse“ (Stärken, Schwächen, Chancen, Risiken + TOWS-Strategien; Übernahme aus Audit-Kennzahlen, Projektrisiken und Chancen). Reiter „Risiken“: Risikoanalyse des Härtungsprojekts: Risiko, Ursache, Kategorie, Eintrittswahrscheinlichkeit × Auswirkung (1–5) = Risikowert, Strategie, Gegenmaßnahmen, Frühwarnindikator, Zuständigkeit, Restrisiko nach Maßnahmen, Heatmaps vorher/nachher, Beispielrisiken als Startpunkt. |
-| **Roadmap** | Priorisierte Liste (P1 sofort … P4 nächstes Audit) aus offenen Befunden, offenen Checklisten-Maßnahmen und Projektrisiken, mit Zuständigkeit, Termin, Überfällig-Markierung und CSV-Export. |
-| **TOM-Übersicht** | Umsetzungsstand der technischen und organisatorischen Maßnahmen je Kategorie nach Art. 32 DSGVO (Übersicht und Bericht). |
-| **Import** | Nmap (XML, -oG, -oN; Netzscans werden je Host auf die Assets verteilt, offene Ports als Liste), Lynis (report.dat, lynis.log), OpenVAS/Greenbone (XML, CSV), OpenSCAP (Results/ARF – setzt Checklisten-Status automatisch), SSG-Datastream/XCCDF (Profil wählbar: CIS, STIG, ANSSI, BSI …), Grundschutz++ (OSCAL JSON/XML), BSI-Kompendium (XML/Text), CSV, DAT, XML, JSON. |
-| **Anleitungen** | Schritt-für-Schritt-Härtung: Vorgehen, Debian/Ubuntu, Fedora/RHEL, Windows Server/Windows 11, macOS, Scans & Nachweise – mit Befehlen und Verweisen in die Checkliste. |
-| **Bericht** | DIN-A4-Hochformat-Bericht als eigenständige HTML-Datei (Stammdaten, Schutzbedarf, Kennzahlen, Maßnahmen inkl. Wirksamkeit, Abweichungen mit Begründung, Scans mit Hash, TOM-Übersicht, Risikobewertung mit Heatmap, Projektrisiken, Roadmap, Unterschriftenfeld). Drucken bzw. „Als PDF speichern“. |
-| **Speichern** | Automatisch im Browser (IndexedDB, Fallback localStorage). Zusätzlich **💾 Speichern** bzw. `Strg+S` → JSON-Datei; **📂 Laden** stellt den Stand wieder her. |
-| **Branding** | Standard ist das Little-RiskBee-Logo. In den Einstellungen: eigenes Logo hochladen (PNG/JPG/WebP/SVG, lokal verkleinert), Abteilung, Anschrift, Kontakt, Webseite, Berichtstitel, Fußzeile/Einstufung und Akzentfarbe. Erscheint auf dem Berichtsdeckblatt, in Kopf-/Fußzeilen und optional im Kopf der Oberfläche. |
-| **Darstellung** | Hell-/Dunkelmodus (automatisch oder manuell), responsiv für Desktop, Tablet und Smartphone, Deutsch/Englisch. **Style-Wechsler** in den Einstellungen: mitgelieferte Stile (`css/themes/`), eigener Pfad zu einer CSS-Datei oder hochgeladene CSS-Datei, Modus „ergänzen“ oder „ersetzen“. Gespeichert (Autosave/JSON) wird der Stil nur, wenn nicht der Standard verwendet wird. Notfall: `index.html?style=default`. |
-| **Finding-Dashboard** | Pentest-Report-Generator: Findings anlegen (leer, aus 9 Vorlagen oder aus OpenVAS/Lynis-Scans), importieren (JSON, CSV mit deutschen/englischen Spaltennamen) und exportieren (JSON, CSV, Markdown). Je Finding: Schweregrad, **CVSS-v3.1-Rechner**, CWE, OWASP Top 10, betroffene Assets und Ziele, Verantwortung/Frist, Kurz-Empfehlung und Markdown-Abschnitte (Zusammenfassung, technische Beschreibung, Auswirkung, Reproduktion/PoC, Nachweise, Empfehlung, Referenzen, Re-Test-Notiz) – **links Markdown-Editor, rechts Live-Vorschau**, Bilder per Knopf oder Strg+V. Re-Test-Status/-Datum/-Prüfer. **Zwischenspeichern** mit Versionen (wiederherstellbar). **Eigene Felder** (Text, Markdown, Auswahl, Zahl, Datum, Ja/Nein, Link) und **eigene Berichtsabschnitte**, Reihenfolge frei. Finding **als Maßnahme** zu bestehendem oder neuem Asset; Re-Test „behoben“ setzt die Maßnahme auf umgesetzt/wirksam. Separater **A4-Pentest-Bericht** (Deckblatt, Dokumentenkontrolle, Inhaltsverzeichnis, Bewertungsschema, Ergebnisübersicht, Findings, Re-Test): drucken, als HTML speichern oder als PDF (Druckdialog). |
-| **Risikobaum** | IT-Risikobaum als Fehlerbaum oder Angriffsbaum: Top-Ereignis über UND-/ODER-Verknüpfungen auf Basisereignisse zurückführen, Wahrscheinlichkeiten (je Jahr) sowie bei Angriffsbäumen Kosten und benötigtes Können erfassen, Gegenmaßnahmen mit Status und Wirksamkeit. Grafische Darstellung mit Gattersymbolen und kritischem Pfad, Wahrscheinlichkeit brutto/netto, minimale Schnittmengen inkl. Single Points of Failure, Bedeutung je Basisereignis („Wo ansetzen?“). Vier Vorlagen, Übernahme ins Risikoregister (Ereignisrate für Monte-Carlo), Export als SVG/JSON, Druck/PDF, Abschnitt im Bericht. |
-| **Positiv-Bericht** | Bericht nur mit Erfolgen für Shareholder, Investoren, Sponsoren, Mitglieder, Kunden oder die Leitung: automatisch erzeugte, belegbare positive Aussagen (nicht positive werden weggelassen), je Aussage abschaltbar oder mit eigenem Text überschreibbar; vorbereitete Texte (Vorwort, Highlights, Ausblick, Dank, Kontakt, Schlusswort) mit Platzhaltern wie `{umsetzungsgrad}`, Textvorlagen je Zielgruppe, eigene Highlights und Meilensteine (plus automatische), Diagramme, Onepager-Variante. Systemnamen/IPs werden standardmäßig weggelassen, optionaler Transparenzhinweis. Drucken, PDF, HTML. |
-| **Gap-Analyse** | Soll-Ist-Vergleich über alle Zielobjekte: Soll gemäß Vorgehensweise/Schutzbedarf je Asset oder einheitlich Basis / Standard / Standard + H. Erfüllung je Zielobjekt und Anforderungsniveau (B/S/H), Abdeckung des Schichtenmodells, **Modellierungslücken** (fehlende Schichten und Kern-Bausteine, Zielobjekte ohne Anforderungen, hoher Schutzbedarf ohne Risikoanalyse), **Lücken-Matrix** Baustein × Zielobjekt, priorisierte Maßnahmenlücken (P1–P3, Sprung in die Checkliste, CSV), Snapshots für den Verlauf, KPI „Erfüllung Basis-Anforderungen“, Abschnitt im Bericht. |
-| **Glossar** | Alle 111 Bausteine der Edition 2023 nach Schichten (ISMS.1, ORP.1 … INF.14) mit Kurzbeschreibung, vorhandenen Einzelanforderungen und „Modelliert bei“, direkt auf Assets modellierbar; alle 47 elementaren Gefährdungen G 0.1–G 0.47 mit Verwendung im Risikoregister (dort jetzt vollständig als Vorschlagsliste); Fachbegriffe. Live-Suche, Schichtfilter, Druck/PDF. |
-| **Ursachenanalyse (Fischgrätendiagramm)** | Ishikawa-Diagramm für Brainstorming und Root-Cause-Analyse: Wirkung im Kopf, Kategorien als Gräten (6M, 8M, IT-Sicherheit, 4S oder eigene, 2–8, Farbe frei). Notizen anlegen (Knopf oder Doppelklick), **per Maus/Touch verschieben** – beim Loslassen wird die Notiz der nächsten Gräte zugeordnet; Tastatur: Pfeiltasten, Entf. Je Notiz Farbe, Hauptursache ⭐, Stimmen (Dot-Voting), 5-Why-Kette und Gegenmaßnahme. Übersicht je Kategorie, Hauptursachen-Tabelle, Übernahme ins Risikoregister, Vorlagen (Ransomware-Vorfall, Patch-Rückstand), Export SVG/JSON, Import, Druck/PDF (A4 quer), Abschnitt im Bericht. |
-| **Ansprechpersonen** | In den Einstellungen Personen mit Funktion, Kontakt, Notfallnummer und Vertretung anlegen. Alle Personenfelder (Verantwortliche, Risikoeigner, Prüfer, Krisenstab …) bieten sie als Drop-Down an – freie Eingabe bleibt möglich. „Namen aus Daten übernehmen“ sammelt bereits verwendete Namen. |
-| **Risikoregister** | Führt eigene Risiken (frei definierbar, 4 × 4), Befundrisiken und Projektrisiken zusammen: Brutto/Netto, Behandlung, Eigner, Review-Termin, CSV-Export. Heatmaps mit Appetit- und Toleranzgrenze. |
-| **Risikoappetit & Risikoakzeptanz** | Appetit-Erklärung, Appetit- und Toleranzgrenze (Kategorie), Verlustappetit/-toleranz in €, Akzeptanzbefugnis, maximale Gültigkeit und Review-Intervall je Kategorie. Formale Risikoakzeptanz (wer, Befugnis, Begründung, Auflagen, befristet) – über Toleranz nur als ausdrückliche Ausnahme der Leitung. Ampelstatus je Risiko (im Appetit, akzeptiert, Entscheidung fehlt, über Toleranz, abgelaufen). |
-| **Monte-Carlo-Analyse** | Quantitative Simulation (Poisson-Häufigkeit × PERT-Schaden, 1 000–100 000 Jahre, reproduzierbar per Seed): Erwartungswert (ALE), P50/P90/P95/P99, Wahrscheinlichkeit über Verlusttoleranz, Verlustüberschreitungskurve, Histogramm, Beitrag je Risiko – brutto und netto. Eigene Dreipunktschätzungen oder Kalibrierung (Vorlagen klein/KMU/groß). |
-| **Pflichten & Reviews** | Pflichtenkalender mit wiederkehrenden Pflichten (wöchentlich … alle 3 Jahre), Vorlagen für Normpflichten (ISO/IEC 27001, BSI, DSGVO, NIS2/BSIG, BSI 200-4), Erledigt-Historie mit Nachweis. Automatische Reviews: Risiken, ablaufende Akzeptanzen, Risikoappetit, Asset-Re-Audit, veraltete Scans, Roadmap-Termine, BIA/BC-Pläne/Übungen/Krisenstab, KPI-Erfassung. Agenda, Monatsansicht, Erinnerung (Zähler im Menü, Hinweis beim Start, optional Browser-Benachrichtigung) und **ICS-Export** mit Serienterminen und Alarmen für Outlook/Thunderbird/Apple. |
-| **KPI-Dashboard** | 22 eingebaute Kennzahlen (Härtung, Schwachstellen, Risiko, Compliance, BCM) mit Ampel, Zielwert/Warnschwelle je KPI („Ziele setzen“), Verlauf (wöchentlich automatisch), eigene KPIs mit Messwerten und Erfassungsintervall sowie „Fehlende Daten & Datenqualität“ mit Sprung zur richtigen Stelle. |
-| **Business-Impact-Analyse** | Je Geschäftsprozess Schadensverlauf über die Zeit (Kategorien × Zeitintervalle) → Vorschlag MTA/MTPD, geforderte Wiederanlaufzeit (WAZ/RTO, Prüfung RTO < MTA), RPO, Wiederanlaufniveau, Zeitkritikalität, Wiederanlaufpriorität, Zeitachse. Abhängige Assets erben die strengste RTO/RPO; Hinweis bei zu niedrigem Verfügbarkeits-Schutzbedarf. |
-| **BC-Pläne** | Planart, Kontinuitätsstrategie, Aktivierungskriterien, Ablauf, Ressourcen, Kommunikation, Freigabe. **Ohne eigene Ziele übernimmt ein Plan RTO/RPO aus der BIA seines Geschäftsprozesses** (Warnung, wenn eigene Ziele lockerer sind). Letzte/nächste Übung und nachgewiesene Wiederanlaufzeit je Plan. |
-| **Krisenstab** | Eskalationsstufen Störung → Notfall → Krise, Rollen/Stabsfunktionen (Leitung, S1–S6, Fachberatung) mit Person und Vertretung, Eskalationspfade (Auslöser, wer meldet/entscheidet/wird alarmiert, Reaktionszeit, Sofortmaßnahmen), Alarmierungskette und druckbare Alarmierungsliste. |
-| **Übungen** | Planung (Übungsart, Ziele, Szenario, geübte Pläne), Durchführung (erreichte Wiederanlaufzeit, Datenverlust, Beobachtungen), Auswertung (Ergebnis, Lessons Learned), Maßnahmen mit Termin (→ Roadmap und Kalender), Jahresübungsplan mit fälligen Übungen. |
+| **Assets / Geltungsbereiche** | Zielobjekte aller Schichten erfassen und nach Typ gruppieren: <br> 🏢 Informationsverbund & Prozesse (`ISMS`, `ORP`, `CON`, `OPS`, `DER`), 🧩 Anwendungen (`APP`), 🖥 IT-Systeme (`SYS` – Hostname, IP, OS, Rolle), 🏭 Industrielle IT (`IND`), 🌐 Netze (`NET`), 🏛 Infrastruktur (`INF`). <br> **Modellierung**: Je Zielobjekt passende der 111 IT-Grundschutz-Bausteine auswählen (inkl. automatischer Vorschläge je Typ/OS). Sind Einzelanforderungen vorhanden (integriert, per Kompendium-Import oder selbst angelegt), erscheinen diese direkt; andernfalls erfolgt eine Gesamtbewertung auf Bausteinebene. CSV-Import wird unterstützt. |
+| **Schutzbedarf** | Vertraulichkeit, Integrität und Verfügbarkeit je Asset bewerten (normal, hoch, sehr hoch) und nachvollziehbar begründen (BSI-Standard 200-2, Maximumprinzip). Steuert automatisch, ob H-Anforderungen eingeblendet werden. |
+| **Checkliste** | Maßnahmen interaktiv bearbeiten: Status (offen, umgesetzt, teilweise, nicht umgesetzt/Risiko, entbehrlich/gestrichen), Pflichtbegründung beim Streichen, Notizen, Nachweise, Zuständigkeiten, Termine, Prüfbefehle zum Kopieren sowie eine **Wirksamkeitskontrolle** (Ergebnis, Datum, Methode, Prüfer). Inklusive Filtern, Gruppierung, Massen-Streichung und eigenen Maßnahmen. |
+| **Bibliotheken** | Detaillierter Vergleich der Kataloge: Anzahl der Maßnahmen je Bibliothek und Betriebssystem, Aufteilung nach B/S/H, Abdeckungsmatrix über 18 Fachthemen, Referenzzahlen der Originalquellen und fachliche Einordnung. |
+| **Anleitungen** | Schritt-für-Schritt-Härtungsleitfäden für Vorgehen, Debian/Ubuntu, Fedora/RHEL, Windows Server/Windows 11, macOS sowie Scans & Nachweise – inklusive direkter Befehle und Verweise in die Checkliste. |
+| **Gap-Analyse** | Soll-Ist-Vergleich über alle Zielobjekte gemäß gewählter Vorgehensweise/Schutzbedarf oder einheitlich (Basis, Standard, Standard + H). Zeigt Erfüllungsgrade je Asset und Niveau (B/S/H), Abdeckung des Schichtenmodells, **Modellierungslücken** (fehlende Schichten/Kern-Bausteine, Assets ohne Anforderungen, hoher Schutzbedarf ohne Risikoanalyse), eine **Lücken-Matrix** (Baustein × Zielobjekt), priorisierte Maßnahmenlücken (`P1–P3` mit Sprung in die Checkliste und CSV-Export), Verlaufs-Snapshots sowie den KPI „Erfüllung Basis-Anforderungen“ |
+| **Glossar** | Nachschlagewerk für alle 111 Bausteine der Edition 2023 (inkl. Kurzbeschreibung, Einzelanforderungen und direkter Modellierung auf Assets), alle 47 elementaren Gefährdungen (`G 0.1–G 0.47`) sowie relevante Fachbegriffe. Mit Live-Suche, Schichtfilter und Druck-/PDF-Ausgabe. |
+<br>
+Scans, Risikomanagement & Simulation
+
+| Bereich | Funktionsumfang |
+|---|---|
+| **Scans & Schwachstellen** | Übersicht aller importierten Scans je Asset mit Scan-Zeitpunkt aus dem Bericht, Importzeitpunkt, Dateiname und **SHA-256-Prüfsumme** als Integritätsnachweis. Befundstatus: offen, teilweise behoben, behoben, Risiko akzeptiert oder Fehlalarm (jeweils mit Begründung). Nicht mehr gefundene Befunde werden bei Folgescans automatisch als behoben markiert; akzeptierte Risiken bleiben erhalten. |
+| **Risikobewertung** | Alle offenen, teilweise behobenen und akzeptierten Befunde der aktuellsten Scans mit Risiko-ID (`R-001` …), Zielobjekt, Bedrohung (Vorschläge aus den elementaren Gefährdungen `G 0.x`), Eintrittshäufigkeit × Schadenshöhe (`4 × 4` in Anlehnung an BSI-Standard 200-3), Heatmap (Grün → Gelb → Orange → Rot), Behandlungsoption (vermeiden, reduzieren, übertragen, akzeptieren), Maßnahme, Risikoeigner und Termin. Beidseitig synchron mit dem Scan-Status; unbewertete Befunde erhalten einen automatischen Vorschlag aus Schweregrad und Schutzbedarf. |
+| **Risikoregister** | Führt frei definierbare eigene Risiken (`4 × 4`), Befundrisiken und Projektrisiken zentral zusammen – inklusive Brutto-/Netto-Bewertung, Behandlung, Eigner, Review-Termin, CSV-Export sowie Heatmaps mit Appetit- und Toleranzgrenze. |
+| **Risikoappetit & -akzeptanz** | Definition von Risikoappetit-Erklärung, Appetit- und Toleranzgrenzen, Verlustappetit/-toleranz in Euro, Akzeptanzbefugnissen, maximaler Gültigkeit und Review-Intervallen. Formale Dokumentation von Risikoakzeptanzen (Freigeber, Befugnis, Begründung, Auflagen, Befristung) – Überschreitungen der Toleranzgrenze sind nur als ausdrückliche Ausnahme der Leitung zulässig. Mit Ampelstatus je Risiko. |
+| **Monte-Carlo-Analyse** | Quantitative Risikosimulation (Poisson-Häufigkeit × PERT-Schaden, 1.000 bis 100.000 Simulationsjahre, reproduzierbar per Seed): berechnet Erwartungswert (ALE), Perzentile (`P50`/`P90`/`P95`/`P99`) und die Wahrscheinlichkeit einer Überschreitung der Verlusttoleranz. Visualisiert als Verlustüberschreitungskurve, Histogramm und Risikobeitrag (brutto/netto) mit eigenen Dreipunktschätzungen oder Kalibrierungsvorlagen (klein, KMU, groß). |
+| **Projektrisiken, Chancen & SWOT** | **Risiken (`1–5`)**: Projektbezogene Risikoanalyse mit Ursache, Kategorie, Eintrittswahrscheinlichkeit × Auswirkung, Strategie, Gegenmaßnahmen, Frühwarnindikator, Zuständigkeit, Restrisiko, Vorher/Nachher-Heatmaps und Beispielvorlagen. **Chancen**: Bewertung von Wahrscheinlichkeit × Nutzen mit Strategien (ausnutzen, verbessern, teilen, akzeptieren) und eigener Matrix. **SWOT-Analyse**: Stärken, Schwächen, Chancen und Risiken inklusive TOWS-Strategien sowie direkter Datenübernahme aus Audit-Kennzahlen, Projektrisiken und Chancen. |
+| **Roadmap** | Priorisierte Maßnahmenliste (`P1 sofort` bis `P4 nächstes Audit`) aus offenen Befunden, offenen Checklisten-Punkten und Projektrisiken – mit Zuständigkeit, Termin, Überfällig-Kennzeichnung und CSV-Export. |
+<br>
+
+Pentesting & Ursachenanalyse
+| Bereich | Funktionsumfang |
+|---|---|
+| **Finding-Dashboard** | Vollwertiger Pentest-Report-Generator: Findings anlegen (leer, aus 9 Vorlagen oder aus OpenVAS-/Lynis-Scans), importieren (JSON, CSV) und exportieren (JSON, CSV, Markdown). **Detailerfassung:** Schweregrad, integrierter **CVSS-v3.1-Rechner**, CWE, OWASP Top 10, betroffene Assets/Ziele, Verantwortung/Frist, Kurz-Empfehlung und strukturierte Markdown-Abschnitte (Zusammenfassung, Technische Beschreibung, Auswirkung, Reproduktion/PoC, Nachweise, Empfehlung, Referenzen, Re-Test-Notiz). **Editor & Berichte:** Split-Screen mit Markdown-Editor links und Live-Vorschau rechts, Bild-Upload per Button oder Strg+V, versioniertes Zwischenspeichern sowie eigene Felder und Berichtsabschnitte. Findings lassen sich direkt als Härtungsmaßnahme übernehmen (Re-Test „behoben“ setzt die Maßnahme auf umgesetzt/wirksam). Separater **DIN-A4-Pentest-Bericht** mit Deckblatt, Dokumentenkontrolle, Inhaltsverzeichnis, Bewertungsschema, Ergebnisübersicht, Findings und Re-Test. |
+| **Risikobaum** | Grafischer IT-Risikobaum (Fehler- oder Angriffsbaum): Top-Ereignis über UND-/ODER-Gatter auf Basisereignisse herunterbrechen, Eintrittswahrscheinlichkeiten pro Jahr sowie bei Angriffsbäumen Kosten und benötigtes Angreifer-Können erfassen und Gegenmaßnahmen samt Wirksamkeit hinterlegen. Berechnet Brutto-/Netto-Wahrscheinlichkeit, kritischen Pfad, minimale Schnittmengen (inkl. Single Points of Failure) und die Bedeutung jedes Basisereignisses („Wo ansetzen?“). Inklusive 4 Vorlagen, Übernahme ins Risikoregister (Ereignisrate für Monte-Carlo) sowie SVG-/JSON-/PDF-Export. |
+| **Ursachenanalyse (Fischgrätendiagramm)** | Interaktives Ishikawa-Diagramm für Brainstorming und Root-Cause-Analysen: Wirkung im Kopf, Kategorien als Gräten (6M, 8M, IT-Sicherheit, 4S oder 2–8 eigene Kategorien mit freier Farbwahl). Notizen per Button oder Doppelklick anlegen und per Maus/Touch frei verschieben (automatische Zuordnung zur nächstgelegenen Gräte) oder per Tastatur (Pfeiltasten, Entf) steuern. Je Notiz: Farbe, Hauptursache (⭐), Dot-Voting, 5-Why-Kette und Gegenmaßnahme. Mit Hauptursachen-Tabelle, Übernahme ins Risikoregister, Vorlagen (Ransomware-Vorfall, Patch-Rückstand), SVG-/JSON-Export und A4-Querformat-Druck. |
+<br>
+
+Governance, Compliance & Business Continuity (BCM)
+| Bereich | Funktionsumfang |
+|---|---|
+| **Pflichten & Reviews** | Pflichtenkalender für wiederkehrende Aufgaben (wöchentlich bis alle 3 Jahre) mit Vorlagen für Normpflichten (ISO/IEC 27001, BSI, DSGVO, NIS2/BSIG, BSI 200-4) und Erledigt-Historie inklusive Nachweis. Automatische Review-Erinnerungen für Risiken, ablaufende Akzeptanzen, Risikoappetit, Asset-Re-Audits, veraltete Scans, Roadmap-Termine, BIA/BC-Pläne/Übungen/Krisenstab und KPI-Erfassungen. Agenda- und Monatsansicht, Zähler im Menü, optionale Browser-Benachrichtigungen sowie ICS-Export mit Serienterminen und Alarmen für Outlook, Thunderbird und Apple Kalender. |
+| **KPI-Dashboard** | 22 integrierte Kennzahlen aus den Bereichen Härtung, Schwachstellen, Risiko, Compliance und BCM mit Ampelstatus, frei definierbaren Zielwerten/Warnschwellen („Ziele setzen“) und automatischer wöchentlicher Verlaufshistorie. Unterstützt zudem eigene KPIs mit Messwerten und Erfassungsintervall sowie eine Übersicht „Fehlende Daten & Datenqualität“ mit direktem Sprung zur jeweiligen Eingabemaske. |
+| **TOM-Übersicht** | Strukturierte Übersicht und Berichtsausgabe zum Umsetzungsstand der technischen und organisatorischen Maßnahmen (TOM) je Kategorie nach Art. 32 DSGVO. |
+| **Business-Impact-Analyse (BIA)** | Schadensverlauf über die Zeit je Geschäftsprozess (Schadenskategorien × Zeitintervalle) mit automatischem Vorschlag für MTA/MTPD, geforderter Wiederanlaufzeit (WAZ/RTO inklusive Prüfung RTO < MTA), RPO, Wiederanlaufniveau, Zeitkritikalität, Wiederanlaufpriorität und visueller Zeitachse. Abhängige Assets erben automatisch die strengste RTO/RPO; bei zu niedrigem Verfügbarkeits-Schutzbedarf erscheint ein Hinweis. |
+| **BC-Pläne** | Dokumentation von Planart, Kontinuitätsstrategie, Aktivierungskriterien, Ablauf, Ressourcen, Kommunikation und Freigabe. Ohne eigene Zielwerte übernimmt ein Plan automatisch RTO/RPO aus der BIA des verknüpften Geschäftsprozesses (und warnt bei lockereren eigenen Zielen). Inklusive Tracking von letzter/nächster Übung und nachgewiesener Wiederanlaufzeit. |
+| **Krisenstab** | Definition der Eskalationsstufen (Störung → Notfall → Krise), Stabsrollen (Leitung, S1–S6, Fachberatung) samt Person und Vertretung, Eskalationspfaden (Auslöser, Melde-/Entscheidungs-/Alarmierungswege, Reaktionszeit, Sofortmaßnahmen) sowie Alarmierungskette und druckbarer Alarmierungsliste. |
+| **Übungen** | Strukturierte Planung (Übungsart, Ziele, Szenario, geübte Pläne), Durchführung (erreichte Wiederanlaufzeit, Datenverlust, Beobachtungen) und Auswertung (Ergebnis, Lessons Learned, Folgemaßnahmen mit Termin für Roadmap und Kalender) sowie Jahresübungsplan mit Fälligkeitsübersicht. |
+<br>
+
+Berichte, Darstellung & System
+| Bereich | Funktionsumfang |
+|---|---|
+| **Bericht (A4)** | Eigenständiger DIN-A4-Hochformat-Bericht als HTML-Datei (Stammdaten, Schutzbedarf, Kennzahlen, Maßnahmen inkl. Wirksamkeit, Abweichungen mit Begründung, Scans mit Hash, TOM-Übersicht, Risikobewertung mit Heatmap, Projektrisiken, Roadmap und Unterschriftenfeld) – direkt druckbar oder als PDF speicherbar. |
+| **Positiv-Bericht** | Zielgruppengerechter Erfolgsbericht für Shareholder, Investoren, Sponsoren, Mitglieder, Kunden oder die Geschäftsleitung: generiert automatisch belegbare positive Aussagen (nicht positive Punkte werden ausgeblendet), die einzeln abschaltbar oder überschreibbar sind. Enthält anpassbare Textbausteine (Vorwort, Highlights, Ausblick, Dank, Kontakt, Schlusswort) mit Platzhaltern wie {umsetzungsgrad}, Zielgruppenvorlagen, eigene Meilensteine, Diagramme und eine Onepager-Variante. Sensible Systemnamen und IP-Adressen werden standardmäßig ausgeblendet. |
+| **Ansprechpersonen** | Zentrale Pflege von Personen mit Funktion, Kontaktdaten, Notfallnummer und Vertretung in den Einstellungen. Alle Personenfelder (Verantwortliche, Risikoeigner, Prüfer, Krisenstab usw.) bieten diese als Dropdown-Auswahl an (freie Eingabe bleibt möglich). Mit „Namen aus Daten übernehmen“ lassen sich bereits genutzte Namen nachträglich einsammeln. |
+| **Branding** | Standardmäßig ist das Little-RiskBee-Logo hinterlegt. In den Einstellungen kannst du ein eigenes Logo hochladen (PNG, JPG, WebP, SVG – wird lokal skaliert) sowie Abteilung, Anschrift, Kontakt, Webseite, Berichtstitel, Fußzeile/Einstufung und Akzentfarbe festlegen. |
+| **Darstellung** | Automatischer oder manueller Hell-/Dunkelmodus, responsives Layout für Desktop, Tablet und Smartphone sowie Sprachumschaltung (DE/EN). Über den Style-Wechsler lassen sich mitgelieferte Themes (css/themes/), eigene CSS-Pfade oder hochgeladene CSS-Dateien im Modus „ergänzen“ oder „ersetzen“ laden. Notfall-Reset über index.html?style=default. |
+| **Speichern** | Kontinuierliche automatische Speicherung im Browser (IndexedDB mit Fallback auf localStorage). Zusätzlich manueller Export über 💾 Speichern bzw. Strg+S als JSON-Datei und Wiederherstellung über 📂 Laden. |
+| **** |  |
 
 
 ## Bibliotheken
